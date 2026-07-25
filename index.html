@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>扶手长度智能组合工具</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif; background: #f0f4f8; min-height: 100vh; color: #1a202c; }
+
+/* Header */
+.header { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); color: #fff; padding: 18px 16px; text-align: center; }
+.header h1 { font-size: 20px; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; }
+.header p { font-size: 12px; opacity: 0.85; }
+
+/* Main layout - mobile centered */
+.main { max-width: 460px; margin: 0 auto; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+
+/* Cards */
+.card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04); padding: 16px; }
+.card-title { font-size: 15px; font-weight: 700; color: #1e3a5f; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.card-title .icon { font-size: 18px; }
+
+/* Customer header */
+.customer-header { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #e2e8f0; }
+.customer-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.customer-row label { font-size: 12px; color: #64748b; font-weight: 600; white-space: nowrap; }
+.customer-row input[type="text"] { flex: 1; min-width: 120px; border: 1.5px solid #e2e8f0; border-radius: 6px; padding: 8px 10px; font-size: 13px; font-family: inherit; transition: border-color 0.2s; }
+.customer-row input[type="text"]:focus { outline: none; border-color: #3b82f6; }
+.customer-row .date-display { font-size: 12px; color: #475569; background: #f1f5f9; padding: 6px 10px; border-radius: 6px; }
+
+/* Quick stats area */
+.quick-stats { display: none; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #86efac; border-radius: 12px; padding: 14px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(22,101,52,0.08); }
+.quick-stats.show { display: block; }
+.quick-stats-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.quick-stats-title { font-size: 15px; font-weight: 800; color: #14532d; display: flex; align-items: center; gap: 4px; }
+.quick-stats-sub { font-size: 11px; color: #15803d; background: #fff; padding: 2px 8px; border-radius: 10px; border: 1px solid #86efac; }
+.quick-stats-list { display: flex; flex-direction: column; gap: 8px; }
+.quick-stat-chip { background: #fff; border: 1.5px solid #86efac; border-radius: 10px; padding: 10px 12px; font-size: 14px; color: #166534; font-weight: 700; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.quick-stat-chip .stat-count { font-size: 18px; font-weight: 800; color: #15803d; }
+
+/* Input area */
+.demand-rows { display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; padding-right: 4px; }
+.demand-rows::-webkit-scrollbar { width: 6px; }
+.demand-rows::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+.demand-row { display: flex; gap: 8px; align-items: center; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; transition: all 0.2s; }
+.demand-row:focus-within { border-color: #3b82f6; background: #fff; }
+.demand-row.confirmed { background: #f0fdf4; border-color: #86efac; }
+.demand-row .row-num { font-size: 12px; color: #94a3b8; font-weight: 600; min-width: 24px; text-align: center; }
+.demand-row input[type="number"] { width: 70px; border: 1.5px solid #e2e8f0; border-radius: 6px; padding: 8px 4px; font-size: 14px; font-family: inherit; text-align: center; transition: border-color 0.2s; flex-shrink: 0; }
+.demand-row input[type="number"]:focus { outline: none; border-color: #3b82f6; }
+.demand-row input[type="number"]:disabled { background: #f1f5f9; color: #475569; }
+.demand-row select { border: 1.5px solid #e2e8f0; border-radius: 6px; padding: 8px 4px; font-size: 13px; font-family: inherit; background: #fff; cursor: pointer; flex: 1; transition: border-color 0.2s; }
+.demand-row select:focus { outline: none; border-color: #3b82f6; }
+.demand-row select:disabled { background: #f1f5f9; color: #475569; appearance: none; }
+.demand-row .btn-row-action { width: 32px; height: 32px; border: none; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; }
+.demand-row .btn-confirm { background: #dcfce7; color: #16a34a; }
+.demand-row .btn-confirm:hover { background: #bbf7d0; transform: scale(1.1); }
+.demand-row .btn-confirm.confirmed { display: none; }
+.demand-row .btn-add-below { background: #dbeafe; color: #2563eb; }
+.demand-row .btn-add-below:hover { background: #bfdbfe; transform: scale(1.1); }
+.demand-row .btn-add-below.hidden { display: none; }
+.demand-row .btn-del-row { width: 32px; height: 32px; border: none; border-radius: 50%; background: #fee2e2; color: #dc2626; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; }
+.demand-row .btn-del-row:hover { background: #fecaca; transform: scale(1.1); }
+.demand-row .confirmed-label { display: none; font-size: 13px; color: #166534; font-weight: 600; flex: 1; }
+.demand-row.confirmed .confirmed-label { display: block; }
+.demand-row.confirmed input, .demand-row.confirmed select { display: none; }
+.demand-row.confirmed .btn-confirm { display: none; }
+.demand-type-count { font-size: 11px; color: #64748b; margin-top: 8px; display: flex; gap: 12px; }
+.demand-type-count span { display: inline-flex; align-items: center; gap: 3px; }
+.demand-type-count .count-num { font-weight: 700; font-size: 15px; }
+
+/* History */
+.history-card { margin-top: 14px; }
+.history-list { display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto; }
+.history-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; cursor: pointer; transition: all 0.15s; }
+.history-item:hover { background: #f1f5f9; border-color: #bfdbfe; }
+.history-item .history-title { font-size: 13px; font-weight: 700; color: #1e3a5f; display: flex; justify-content: space-between; }
+.history-item .history-meta { font-size: 11px; color: #64748b; margin-top: 3px; }
+.history-empty { text-align: center; color: #94a3b8; font-size: 13px; padding: 16px; }
+.history-btn-del { color: #dc2626; background: none; border: none; cursor: pointer; font-size: 12px; }
+.history-btn-del:hover { text-decoration: underline; }
+
+.btn-row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.btn { padding: 10px 16px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; }
+.btn-primary { background: #3b82f6; color: #fff; }
+.btn-primary:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+.btn-secondary { background: #e2e8f0; color: #475569; }
+.btn-secondary:hover { background: #cbd5e1; }
+.btn-danger { background: #fef2f2; color: #dc2626; }
+.btn-danger:hover { background: #fee2e2; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* Available products quick ref */
+.spec-section { margin-bottom: 12px; }
+.spec-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
+.spec-section-header-left { display: flex; align-items: center; gap: 10px; }
+.spec-section-title { font-size: 14px; font-weight: 700; color: #1e3a5f; display: flex; align-items: center; gap: 6px; }
+.spec-section-sub { font-size: 11px; color: #64748b; }
+.unit-selector { display: flex; align-items: center; gap: 4px; }
+.unit-selector label { font-size: 11px; color: #64748b; }
+.unit-selector select { border: 1.5px solid #e2e8f0; border-radius: 5px; padding: 3px 4px; font-size: 11px; font-family: inherit; background: #fff; cursor: pointer; color: #475569; }
+.unit-selector select:focus { outline: none; border-color: #3b82f6; }
+.products-ref { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+.products-ref .prod-col { background: #f8fafc; border-radius: 8px; padding: 8px 10px; border: 1.5px solid #e2e8f0; }
+.products-ref .prod-col .col-label { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+.products-ref .prod-col .col-label input { width: 100%; border: none; background: transparent; font-size: 10px; font-weight: 700; color: #64748b; padding: 0; }
+.products-ref .prod-col .prod-chip { display: inline-flex; align-items: center; gap: 2px; background: #e0e7ff; color: #3730a3; padding: 2px 5px; border-radius: 10px; font-size: 10px; margin: 1px 2px; white-space: nowrap; cursor: text; }
+.products-ref .prod-col .prod-chip:focus { outline: 1.5px solid #3b82f6; background: #fff; }
+.products-ref .prod-col .prod-chip .chip-del { display: none; width: 12px; height: 12px; align-items: center; justify-content: center; border-radius: 50%; background: #fecaca; color: #dc2626; font-size: 9px; cursor: pointer; margin-left: 2px; }
+.products-ref .prod-col .prod-chip:hover .chip-del { display: inline-flex; }
+.products-ref .prod-col .chip-add { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 18px; border: 1.5px dashed #cbd5e1; border-radius: 10px; color: #64748b; font-size: 12px; cursor: pointer; background: #fff; margin: 1px 2px; }
+.products-ref .prod-col .chip-add:hover { border-color: #3b82f6; color: #3b82f6; }
+.spec-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-spec { font-size: 12px; padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer; background: #f1f5f9; color: #475569; }
+.btn-spec:hover { background: #e2e8f0; }
+
+/* Paste modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+.modal-overlay.show { display: flex; }
+.modal-box { background: #fff; border-radius: 12px; width: 100%; max-width: 420px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+.modal-header { padding: 14px 16px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+.modal-title { font-size: 15px; font-weight: 700; color: #1e3a5f; }
+.modal-close { width: 28px; height: 28px; border: none; background: #f1f5f9; border-radius: 50%; cursor: pointer; color: #64748b; }
+.modal-body { padding: 16px; overflow-y: auto; }
+.paste-hint { font-size: 12px; color: #64748b; margin-bottom: 8px; line-height: 1.5; }
+.paste-area { width: 100%; min-height: 140px; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 13px; font-family: inherit; resize: vertical; }
+.paste-area:focus { outline: none; border-color: #3b82f6; }
+.paste-preview { margin-top: 12px; }
+.paste-preview-title { font-size: 12px; font-weight: 700; color: #166534; margin-bottom: 6px; }
+.paste-preview-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.paste-preview-chip { background: #f0fdf4; border: 1px solid #86efac; border-radius: 16px; padding: 3px 8px; font-size: 12px; color: #166534; position: relative; display: inline-flex; align-items: center; gap: 4px; }
+.paste-chip-close { width: 14px; height: 14px; border-radius: 50%; background: #fecaca; color: #dc2626; font-size: 9px; line-height: 14px; text-align: center; cursor: pointer; flex-shrink: 0; }
+.paste-chip-close:hover { background: #fca5a5; }
+.modal-footer { padding: 12px 16px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Results area */
+.result-empty { text-align: center; padding: 40px 16px; color: #94a3b8; }
+.result-empty .empty-icon { font-size: 48px; margin-bottom: 12px; }
+.result-empty p { font-size: 14px; }
+
+/* Stats bar */
+.stats-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.stat-card { flex: 1; min-width: 70px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 8px; padding: 10px 10px; border: 1px solid #bae6fd; text-align: center; }
+.stat-card.waste { background: linear-gradient(135deg, #fef3c7, #fef9c3); border-color: #fde68a; }
+.stat-card.saved { background: linear-gradient(135deg, #ecfdf5, #d1fae5); border-color: #a7f3d0; }
+.stat-card .stat-value { font-size: 20px; font-weight: 800; color: #1e40af; }
+.stat-card.waste .stat-value { color: #92400e; }
+.stat-card.saved .stat-value { color: #065f46; }
+.stat-card .stat-label { font-size: 11px; color: #64748b; margin-top: 2px; }
+
+/* Group cards */
+.group-list { display: flex; flex-direction: column; gap: 10px; }
+.group-card { border: 2px solid #e2e8f0; border-radius: 10px; padding: 12px 14px; transition: border-color 0.2s; }
+.group-card.best-fit { border-color: #86efac; background: #f0fdf4; }
+.group-card.good-fit { border-color: #fde68a; background: #fffdf5; }
+.group-card.poor-fit { border-color: #fecaca; background: #fff5f5; }
+.group-card.overfit { border-color: #ef4444; background: #fef2f2; }
+.group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 6px; }
+.group-badge { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; }
+.group-badge .badge-num { background: #1e3a5f; color: #fff; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
+.group-type-tag { font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: 600; }
+.group-type-tag.plain { background: #dbeafe; color: #1e40af; }
+.group-type-tag.left { background: #ede9fe; color: #6d28d9; }
+.group-type-tag.right { background: #fce7f3; color: #be185d; }
+
+.group-items { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.item-chip { padding: 3px 8px; border-radius: 14px; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 3px; }
+.item-chip.plain-piece { background: #e0e7ff; color: #3730a3; }
+.item-chip.curved-piece { background: #ede9fe; color: #6d28d9; border: 1.5px dashed #a78bfa; }
+
+.group-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px dashed #e2e8f0; flex-wrap: wrap; gap: 4px; }
+.group-total { font-size: 13px; color: #475569; }
+.group-total strong { color: #1e3a5f; font-size: 15px; }
+.group-arrow { color: #3b82f6; font-weight: 700; margin: 0 4px; }
+.group-product { font-size: 14px; font-weight: 700; color: #2563eb; }
+.group-waste { font-size: 12px; padding: 3px 8px; border-radius: 12px; font-weight: 600; }
+.group-waste.good { background: #dcfce7; color: #166534; }
+.group-waste.medium { background: #fef9c3; color: #92400e; }
+.group-waste.bad { background: #fee2e2; color: #991b1b; }
+
+/* Tip box */
+.tip-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 14px; margin-top: 12px; font-size: 12px; color: #92400e; line-height: 1.6; }
+.tip-box strong { color: #d97706; }
+
+/* Error */
+.error-msg { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 12px 16px; border-radius: 8px; font-size: 14px; margin-top: 12px; display: none; }
+.error-msg.show { display: block; }
+
+/* Toast */
+.toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #14532d; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+.toast.show { opacity: 1; }
+.toast.warn { background: #92400e; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🪜 扶手长度智能组合工具</h1>
+  <p>输入客户需求尺寸，自动计算最优组合方案，最小化浪费</p>
+</div>
+
+<div class="main">
+  <!-- Left: Input -->
+  <div class="input-section">
+    <div class="card">
+      <div class="card-title"><span class="icon">📋</span> 客户需求输入</div>
+
+      <!-- Customer info -->
+      <div class="customer-header">
+        <div class="customer-row">
+          <label>客户姓名：</label>
+          <input type="text" id="customerName" placeholder="请输入客户姓名">
+          <span class="date-display" id="calcDate">计算日期：--</span>
+        </div>
+      </div>
+
+      <!-- My available specs -->
+      <div class="spec-section">
+        <div class="spec-section-header">
+          <div class="spec-section-header-left">
+            <div class="spec-section-title"><span>🏷️</span> 我家有的规格</div>
+            <div class="unit-selector">
+              <label>单位：</label>
+              <select id="displayUnit" onchange="changeDisplayUnit(this.value)">
+                <option value="m">米 (m)</option>
+                <option value="cm">厘米 (cm)</option>
+                <option value="mm">毫米 (mm)</option>
+              </select>
+            </div>
+          </div>
+          <div class="spec-section-sub">点击数字可直接修改</div>
+        </div>
+        <div class="products-ref" id="specRef">
+          <div class="prod-col" data-type="plain">
+            <div class="col-label"><input value="直扶手" onchange="updateSpecLabel('plain', this.value)"></div>
+            <div class="spec-chips" id="specChips-plain"></div>
+            <button class="chip-add" onclick="addSpecLength('plain')" title="添加规格">+</button>
+          </div>
+          <div class="prod-col" data-type="left">
+            <div class="col-label"><input value="+左起步弯" onchange="updateSpecLabel('left', this.value)"></div>
+            <div class="spec-chips" id="specChips-left"></div>
+            <button class="chip-add" onclick="addSpecLength('left')" title="添加规格">+</button>
+          </div>
+          <div class="prod-col" data-type="right">
+            <div class="col-label"><input value="+右起步弯" onchange="updateSpecLabel('right', this.value)"></div>
+            <div class="spec-chips" id="specChips-right"></div>
+            <button class="chip-add" onclick="addSpecLength('right')" title="添加规格">+</button>
+          </div>
+        </div>
+        <div class="spec-actions">
+          <button class="btn-spec" onclick="resetSpecs()">↺ 恢复默认</button>
+          <button class="btn-spec" onclick="openPasteModal()" style="background:#dbeafe;color:#1e40af;">📋 粘贴识别</button>
+        </div>
+      </div>
+
+      <!-- Quick result stats -->
+      <div class="quick-stats" id="quickStats">
+        <div class="quick-stats-header">
+          <div class="quick-stats-title">📊 最优组合方案</div>
+          <div class="quick-stats-sub">下面查看组合结果（可核对）</div>
+        </div>
+        <div class="quick-stats-list" id="quickStatsList"></div>
+      </div>
+
+      <div class="demand-rows" id="demandRows"></div>
+      <div class="demand-type-count" id="demandCount"></div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="calculate()">🔍 智能计算</button>
+        <button class="btn-circle" onclick="addRow()" title="添加一行">＋</button>
+        <button class="btn btn-secondary" onclick="loadExample()">📥 加载示例</button>
+        <button class="btn btn-danger" onclick="clearAll()">🔄 全部清空</button>
+      </div>
+
+      <div id="errorMsg" class="error-msg"></div>
+
+      <div class="tip-box">
+        <strong>💡 规则说明：</strong><br>
+        ① 扶手整条卖，按成品长度向上取整（如3.3米→卖3.6米）<br>
+        ② 每组最多含<b>1个</b>带"起步弯"的需求<br>
+        ③ 自动组合直扶手与起步弯，最小化浪费<br>
+        ④ 成品可选：3.0m / 3.6m / 4.0m / 4.5m
+      </div>
+    </div>
+
+    <!-- History records -->
+    <div class="card history-card">
+      <div class="card-title"><span class="icon">📜</span> 历史记录</div>
+      <div class="history-list" id="historyList">
+        <div class="history-empty">暂无历史记录</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Results -->
+  <div>
+    <div class="card" id="resultCard">
+      <div class="card-title"><span class="icon">📊</span> 组合结果</div>
+      <div id="resultContent">
+        <div class="result-empty">
+          <div class="empty-icon">📐</div>
+          <p>输入客户需求后点击「智能计算」查看最优组合方案</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;" id="summaryCard" hidden>
+      <div class="card-title"><span class="icon">📈</span> 汇总统计</div>
+      <div class="stats-bar" id="statsBar"></div>
+      <div id="copyBtnRow" style="text-align:right;margin-top:12px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Paste recognition modal -->
+<div class="modal-overlay" id="pasteModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">📋 粘贴文字自动识别</div>
+      <button class="modal-close" onclick="closePasteModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="paste-hint">
+        把客户发来的尺寸文字粘贴到下面，支持多种格式：<br>
+        • 3.5米 / 3.5m / 350cm（3位数以上默认为mm）<br>
+        • 3.5米左起步弯 / 3.5左 / 左起步 3.5<br>
+        • 3.5右 / 3.5米右起步弯 / 1700（自动识别4位数=毫米）<br>
+        • 多个尺寸可用空格、逗号或换行分隔<br>
+        <span style="color:#6b7280;font-size:10px;">ⓘ 识别后可在右上角×删除错误项</span>
+      </div>
+      <textarea class="paste-area" id="pasteArea" placeholder="例如：&#10;3.5米左起步弯&#10;2.8右&#10;1.2, 1.5m"></textarea>
+      <div class="paste-preview" id="pastePreview" style="display:none;">
+        <div class="paste-preview-title">识别到 <span id="pastePreviewCount">0</span> 条：</div>
+        <div class="paste-preview-list" id="pastePreviewList"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closePasteModal()">取消</button>
+      <button class="btn btn-primary" onclick="applyPasteRows()">确认添加</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ========== 常量 ==========
+const DEFAULT_SPECS = {
+  plain: { label: '直扶手', lengths: [3.0, 3.6, 4.0, 4.5] },
+  left:  { label: '+左起步弯', lengths: [3.0, 3.6, 4.0, 4.5] },
+  right: { label: '+右起步弯', lengths: [3.0, 3.6, 4.0, 4.5] }
+};
+const SPEC_KEY = 'handrail_spec_config';
+const UNIT_KEY = 'handrail_display_unit';
+let SPEC_CONFIG = loadSpecs();
+let UNIT = loadUnit();  // 'm' | 'cm' | 'mm'
+
+function loadSpecs() {
+  try {
+    const saved = localStorage.getItem(SPEC_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch {}
+  return JSON.parse(JSON.stringify(DEFAULT_SPECS));
+}
+
+function loadUnit() {
+  const u = localStorage.getItem(UNIT_KEY);
+  return (u === 'm' || u === 'cm' || u === 'mm') ? u : 'm';
+}
+
+function saveSpecs() {
+  localStorage.setItem(SPEC_KEY, JSON.stringify(SPEC_CONFIG));
+  renderSpecs();
+  updateTipBox();
+}
+
+// 单位转换：内部米 → 显示值
+function formatAsUnit(mVal, unit) {
+  if (unit === 'm') return mVal;
+  if (unit === 'cm') return Math.round(mVal * 100);
+  if (unit === 'mm') return Math.round(mVal * 1000);
+  return mVal;
+}
+
+function unitLabel(unit) {
+  if (unit === 'm') return '米';
+  if (unit === 'cm') return '厘米';
+  if (unit === 'mm') return '毫米';
+}
+
+// 显示值 → 内部米
+function fromDisplayUnit(val) {
+  if (UNIT === 'cm') return val / 100;
+  if (UNIT === 'mm') return val / 1000;
+  return val;
+}
+
+function changeDisplayUnit(newUnit) {
+  const oldUnit = UNIT;
+  const rows = document.querySelectorAll('#demandRows .demand-row');
+  // 单次转换：旧单位读取→米→新单位显示
+  rows.forEach(row => {
+    const input = row.querySelector('input[type="number"]');
+    if (!input || input.disabled || !input.value.trim()) return;
+    UNIT = oldUnit;
+    const mVal = fromDisplayUnit(parseFloat(input.value));
+    UNIT = newUnit;
+    if (!isNaN(mVal)) input.value = formatAsUnit(mVal, newUnit);
+  });
+  localStorage.setItem(UNIT_KEY, UNIT);
+  document.getElementById('displayUnit').value = UNIT;
+  // 更新输入框属性
+  rows.forEach(row => {
+    const input = row.querySelector('input[type="number"]');
+    if (!input || input.disabled) return;
+    const maxLen = getMaxLength();
+    if (UNIT === 'm') { input.step = '0.01'; input.max = maxLen; input.placeholder = '尺寸(米)'; }
+    else if (UNIT === 'cm') { input.step = '1'; input.max = Math.round(maxLen * 100); input.placeholder = '尺寸(厘米)'; }
+    else { input.step = '10'; input.max = Math.round(maxLen * 1000); input.placeholder = '尺寸(毫米)'; }
+  });
+  renderSpecs();
+  updateTipBox();
+}
+
+function getMaxLength() {
+  let max = 4.5;
+  Object.values(SPEC_CONFIG).forEach(s => {
+    s.lengths.forEach(l => { if (l > max) max = l; });
+  });
+  return max;
+}
+
+// ========== 工具函数 ==========
+function toCm(m) { return Math.round(m * 100); }
+function toM(cm) { return cm / 100; }
+
+function findBestProduct(totalNeeded, type) {
+  const lengths = (SPEC_CONFIG[type]?.lengths || DEFAULT_SPECS[type].lengths).slice().sort((a, b) => a - b);
+  for (let len of lengths) {
+    if (len >= totalNeeded - 0.001) return len;
+  }
+  return null;
+}
+
+function productLabel(length, type) {
+  const label = SPEC_CONFIG[type]?.label || DEFAULT_SPECS[type].label;
+  if (type === 'plain') return `${length}米${label}`;
+  if (type === 'left') return `${length}米${label}`;
+  if (type === 'right') return `${length}米${label}`;
+}
+
+// ========== 动态行管理 ==========
+let _rowCounter = 0;
+
+function createDemandRow(lengthVal = '', bendType = 'plain', confirmed = false) {
+  const id = ++_rowCounter;
+  const container = document.createElement('div');
+  container.className = 'demand-row' + (confirmed ? ' confirmed' : '');
+  container.dataset.rowId = id;
+
+  const labelText = confirmed ? _formatRowLabel(lengthVal, bendType) : '';
+
+  const maxLen = getMaxLength();
+  let step, max, ph;
+  if (UNIT === 'm') { step = '0.01'; max = maxLen; ph = '尺寸(米)'; }
+  else if (UNIT === 'cm') { step = '1'; max = Math.round(maxLen * 100); ph = '尺寸(厘米)'; }
+  else { step = '10'; max = Math.round(maxLen * 1000); ph = '尺寸(毫米)'; }
+  const displayVal = lengthVal !== '' && !isNaN(lengthVal) ? formatAsUnit(parseFloat(lengthVal), UNIT) : '';
+
+  container.innerHTML = `
+    <span class="row-num">-</span>
+    <input type="number" step="${step}" min="0" max="${max}" placeholder="${ph}" value="${displayVal}" ${confirmed ? 'disabled' : ''}>
+    <select ${confirmed ? 'disabled' : ''}>
+      <option value="plain" ${bendType === 'plain' ? 'selected' : ''}>直扶手</option>
+      <option value="left" ${bendType === 'left' ? 'selected' : ''}>＋左起步弯</option>
+      <option value="right" ${bendType === 'right' ? 'selected' : ''}>＋右起步弯</option>
+    </select>
+    <span class="confirmed-label">${labelText}</span>
+    <button class="btn-row-action btn-confirm ${confirmed ? 'confirmed' : ''}" title="确认此行" onclick="confirmRow(this)">✅</button>
+    <button class="btn-row-action btn-add-below hidden" title="在下方添加一行" onclick="addRowBelow(this)">+</button>
+    <button class="btn-del-row" title="删除此行" onclick="removeRow(this)">×</button>
+  `;
+  return container;
+}
+
+function _formatRowLabel(val, type) {
+  const label = SPEC_CONFIG[type]?.label || DEFAULT_SPECS[type].label;
+  if (type === 'plain') return `${val}米 ${label}`;
+  if (type === 'left') return `${val}米 ${label}`;
+  if (type === 'right') return `${val}米 ${label}`;
+  return `${val}米`;
+}
+
+// ========== 我家有的规格管理 ==========
+function resetSpecs() {
+  if (!confirm('确定恢复默认规格吗？')) return;
+  SPEC_CONFIG = JSON.parse(JSON.stringify(DEFAULT_SPECS));
+  saveSpecs();
+}
+
+function renderSpecs() {
+  const u = UNIT;
+  const ul = unitLabel(u);
+  for (const type of ['plain', 'left', 'right']) {
+    const container = document.getElementById('specChips-' + type);
+    if (!container) continue;
+    const conf = SPEC_CONFIG[type];
+    container.innerHTML = conf.lengths.map((len, idx) => `
+      <span class="prod-chip" contenteditable="true"
+        onblur="updateSpecLength('${type}', ${idx}, this)"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">
+        ${formatAsUnit(len, u)}${ul}<span class="chip-del" onclick="deleteSpecLength('${type}', ${idx})" title="删除">×</span>
+      </span>
+    `).join('');
+    const col = container.closest('.prod-col');
+    if (col) col.querySelector('.col-label input').value = conf.label;
+  }
+}
+
+function updateSpecLabel(type, label) {
+  SPEC_CONFIG[type].label = label.trim() || DEFAULT_SPECS[type].label;
+  saveSpecs();
+}
+
+function updateSpecLength(type, idx, el) {
+  const text = el.childNodes[0] ? el.childNodes[0].textContent : el.textContent;
+  const val = parseFloat(text.replace(/[毫厘m米cm\s]/gi, '').trim());
+  if (!isNaN(val) && val > 0) {
+    SPEC_CONFIG[type].lengths[idx] = fromDisplayUnit(val);
+  }
+  saveSpecs();
+}
+
+function addSpecLength(type) {
+  const lengths = SPEC_CONFIG[type].lengths;
+  const last = lengths[lengths.length - 1] || 4.5;
+  lengths.push(parseFloat((last + 0.5).toFixed(1)));
+  saveSpecs();
+  setTimeout(() => {
+    const chips = document.querySelectorAll('#specChips-' + type + ' .prod-chip');
+    if (chips.length) {
+      chips[chips.length - 1].focus();
+      document.getSelection().selectAllChildren(chips[chips.length - 1]);
+    }
+  }, 50);
+}
+
+function deleteSpecLength(type, idx) {
+  SPEC_CONFIG[type].lengths.splice(idx, 1);
+  saveSpecs();
+}
+
+function updateTipBox() {
+  const allLengths = [...new Set([
+    ...SPEC_CONFIG.plain.lengths,
+    ...SPEC_CONFIG.left.lengths,
+    ...SPEC_CONFIG.right.lengths
+  ])].sort((a, b) => a - b);
+  const ul = unitLabel(UNIT);
+  const tip = document.querySelector('.tip-box');
+  if (tip) {
+    tip.innerHTML = `<strong>💡 规则说明：</strong><br>
+    ① 扶手整条卖，按成品长度向上取整<br>
+    ② 每组最多含<b>1个</b>带"起步弯"的需求<br>
+    ③ 自动组合直扶手与起步弯，最小化浪费<br>
+    ④ 成品可选：${allLengths.map(l => formatAsUnit(l, UNIT) + ul).join(' / ')}`;
+  }
+}
+
+// ========== 粘贴文字识别 ==========
+function openPasteModal() {
+  document.getElementById('pasteModal').classList.add('show');
+  document.getElementById('pasteArea').value = '';
+  document.getElementById('pastePreview').style.display = 'none';
+  setTimeout(() => document.getElementById('pasteArea').focus(), 100);
+}
+
+function closePasteModal() {
+  document.getElementById('pasteModal').classList.remove('show');
+}
+
+function parsePastedText(text) {
+  // 预处理：统一替换中文单位/标点
+  let normalized = text
+    .replace(/[，,;；]/g, ' ')
+    .replace(/毫米/g, 'mm')
+    .replace(/厘米/g, 'cm')
+    .replace(/公分/g, 'cm')
+    .replace(/米/g, 'm')
+    .replace(/左起步弯/g, '左')
+    .replace(/右起步弯/g, '右')
+    .replace(/起步弯/g, '')
+    .replace(/\+/g, ' ')
+    .replace(/直扶手/g, '直');
+
+  const tokens = normalized.split(/[\s\n\r\t]+/).filter(t => t);
+  const rows = [];
+
+  for (let token of tokens) {
+    // 匹配数字+可选单位
+    const match = token.match(/(\d+(?:\.\d+)?)\s*(mm|cm|m)?/i);
+    if (!match) continue;
+    let val = parseFloat(match[1]);
+    const explicitUnit = (match[2] || '').toLowerCase();
+
+    if (explicitUnit === 'mm') { val = val / 1000; }
+    else if (explicitUnit === 'cm') { val = val / 100; }
+    else if (explicitUnit === 'm') { /* already meters */ }
+    else {
+      // 无明确单位：智能推断
+      // 3-4位数 (>=100) → 怀疑是mm，转为米
+      if (val >= 100) { val = val / 1000; }
+      // 个位数或带小数 → 保持为米
+    }
+
+    if (isNaN(val) || val <= 0) continue;
+
+    let type = 'plain';
+    const lower = token.toLowerCase();
+    if (lower.includes('左')) type = 'left';
+    else if (lower.includes('右')) type = 'right';
+
+    rows.push({ length: val, type });
+  }
+  return rows;
+}
+
+// 粘贴识别当前解析结果（供删除使用）
+let _pasteRows = [];
+
+function updatePastePreview() {
+  const text = document.getElementById('pasteArea').value;
+  const rows = parsePastedText(text);
+  _pasteRows = rows;
+  const preview = document.getElementById('pastePreview');
+  const list = document.getElementById('pastePreviewList');
+  const count = document.getElementById('pastePreviewCount');
+  if (rows.length === 0) {
+    preview.style.display = 'none';
+    return;
+  }
+  count.textContent = rows.length;
+  list.innerHTML = rows.map((r, i) => {
+    const typeLabel = SPEC_CONFIG[r.type]?.label || DEFAULT_SPECS[r.type].label;
+    const displayLen = formatAsUnit(r.length, UNIT);
+    const ul = unitLabel(UNIT);
+    return `<span class="paste-preview-chip">${displayLen}${ul} ${typeLabel}<span class="paste-chip-close" data-paste-idx="${i}" onclick="deletePasteChip(event, ${i})" title="删除此项">×</span></span>`;
+  }).join('');
+  preview.style.display = 'block';
+}
+
+function deletePasteChip(e, idx) {
+  e.stopPropagation();
+  _pasteRows.splice(idx, 1);
+  // 重建预览
+  const preview = document.getElementById('pastePreview');
+  const list = document.getElementById('pastePreviewList');
+  const count = document.getElementById('pastePreviewCount');
+  if (_pasteRows.length === 0) {
+    preview.style.display = 'none';
+    return;
+  }
+  count.textContent = _pasteRows.length;
+  list.innerHTML = _pasteRows.map((r, i) => {
+    const typeLabel = SPEC_CONFIG[r.type]?.label || DEFAULT_SPECS[r.type].label;
+    const displayLen = formatAsUnit(r.length, UNIT);
+    const ul = unitLabel(UNIT);
+    return `<span class="paste-preview-chip">${displayLen}${ul} ${typeLabel}<span class="paste-chip-close" onclick="deletePasteChip(event, ${i})" title="删除此项">×</span></span>`;
+  }).join('');
+}
+
+function applyPasteRows() {
+  // 优先使用删除后的 _pasteRows，否则重新解析
+  let rows = _pasteRows.length > 0 ? _pasteRows : parsePastedText(document.getElementById('pasteArea').value);
+  if (rows.length === 0) {
+    alert('未识别到有效尺寸');
+    return;
+  }
+  const rowsEl = document.getElementById('demandRows');
+  if (rowsEl.children.length === 1) {
+    const firstInput = rowsEl.children[0].querySelector('input');
+    if (!firstInput.value.trim()) rowsEl.innerHTML = '';
+  }
+  rows.forEach(r => {
+    rowsEl.appendChild(createDemandRow(r.length, r.type));
+  });
+  _pasteRows = [];
+  _renumber();
+  _updateCount();
+  closePasteModal();
+  calculate();
+}
+
+function _getRowIndex(rowEl) {
+  const parent = (rowEl && rowEl.parentElement) || document.getElementById('demandRows');
+  if (!parent) return 0;
+  return Array.from(parent.children).indexOf(rowEl || parent.lastChild);
+}
+
+function _renumber() {
+  const rows = document.querySelectorAll('#demandRows .demand-row');
+  rows.forEach((r, i) => {
+    r.querySelector('.row-num').textContent = i + 1;
+  });
+}
+
+function addRow(lengthVal, bendType, afterRow = null) {
+  const rowsEl = document.getElementById('demandRows');
+  const row = createDemandRow(lengthVal, bendType);
+  if (afterRow && afterRow.parentElement === rowsEl) {
+    afterRow.after(row);
+  } else {
+    rowsEl.appendChild(row);
+  }
+  _renumber();
+  _updateCount();
+  // Focus the new input
+  setTimeout(() => row.querySelector('input').focus(), 100);
+}
+
+function confirmRow(btn) {
+  const row = btn.closest('.demand-row');
+  const input = row.querySelector('input');
+  const select = row.querySelector('select');
+  const val = parseFloat(input.value);
+
+  if (isNaN(val) || val <= 0) {
+    input.style.borderColor = '#dc2626';
+    input.focus();
+    setTimeout(() => { input.style.borderColor = ''; }, 1500);
+    return;
+  }
+
+  row.classList.add('confirmed');
+  input.disabled = true;
+  select.disabled = true;
+  const mVal = fromDisplayUnit(val);
+  row.querySelector('.confirmed-label').textContent = _formatRowLabel(mVal, select.value);
+  btn.classList.add('confirmed');
+  const addBtn = row.querySelector('.btn-add-below');
+  addBtn.classList.remove('hidden');
+  _updateCount();
+}
+
+function addRowBelow(btn) {
+  const row = btn.closest('.demand-row');
+  addRow('', 'plain', row);
+}
+
+function removeRow(btn) {
+  const rowsEl = document.getElementById('demandRows');
+  if (rowsEl.children.length <= 1) return; // keep at least 1 row
+  btn.closest('.demand-row').remove();
+  _renumber();
+  _updateCount();
+}
+
+function _updateCount() {
+  const rows = document.querySelectorAll('#demandRows .demand-row');
+  let p = 0, l = 0, r = 0;
+  rows.forEach(row => {
+    const sel = row.querySelector('select').value;
+    if (sel === 'plain') p++;
+    else if (sel === 'left') l++;
+    else if (sel === 'right') r++;
+  });
+  const el = document.getElementById('demandCount');
+  el.innerHTML = `<span>直扶手 <span class="count-num" style="color:#2563eb;">${p}</span></span><span>＋左起步 <span class="count-num" style="color:#7c3aed;">${l}</span></span><span>＋右起步 <span class="count-num" style="color:#db2777;">${r}</span></span><span>共 <span class="count-num" style="color:#1e3a5f;">${rows.length}</span> 条</span>`;
+}
+
+// ========== 读取需求 ==========
+function getDemands() {
+  const plain = [];
+  const left = [];
+  const right = [];
+  const errors = [];
+
+  const rows = document.querySelectorAll('#demandRows .demand-row');
+  rows.forEach(row => {
+    let val = parseFloat(row.querySelector('input').value);
+    if (isNaN(val) || val <= 0) {
+      errors.push('空或无效尺寸');
+      return;
+    }
+    val = fromDisplayUnit(val);  // 转换为内部米制
+    const type = row.querySelector('select').value;
+    if (type === 'plain') plain.push(val);
+    else if (type === 'left') left.push(val);
+    else if (type === 'right') right.push(val);
+  });
+
+  return { plain, left, right, errors };
+}
+
+// ========== 背包算法（0/1 knapsack） ==========
+function knapsackFill(plainCm, availableIndices, capacityCm) {
+  // plainCm: 原始直扶手需求数组（整数cm）
+  // availableIndices: 还可用在 plainCm 中的索引列表
+  // capacityCm: 剩余容量（整数cm）
+  // 返回: { selectedIndices, totalCm, remainingIndices }
+
+  const n = availableIndices.length;
+  if (n === 0 || capacityCm <= 0) {
+    return { selectedIndices: [], totalCm: 0, remainingIndices: [...availableIndices] };
+  }
+
+  // prev[w] = [prevWeight, itemLocalIdx] 追踪达到重量w的最后一步
+  const prev = new Array(capacityCm + 1).fill(null);
+  prev[0] = [-1, -1];
+
+  for (let i = 0; i < n; i++) {
+    const w = plainCm[availableIndices[i]];
+    for (let j = capacityCm; j >= w; j--) {
+      if (prev[j - w] !== null && prev[j] === null) {
+        prev[j] = [j - w, i];
+      }
+    }
+  }
+
+  // 找到最大可达的和
+  let bestW = capacityCm;
+  while (bestW >= 0 && prev[bestW] === null) bestW--;
+  if (bestW < 0) bestW = 0;
+
+  // 回溯
+  const selectedSet = new Set();
+  let w = bestW;
+  while (prev[w] && prev[w][0] >= 0) {
+    selectedSet.add(prev[w][1]);
+    w = prev[w][0];
+  }
+
+  const selectedIndices = [];
+  const remainingIndices = [];
+  for (let i = 0; i < n; i++) {
+    if (selectedSet.has(i)) {
+      selectedIndices.push(availableIndices[i]);
+    } else {
+      remainingIndices.push(availableIndices[i]);
+    }
+  }
+
+  return { selectedIndices, totalCm: bestW, remainingIndices };
+}
+
+// ========== 装箱算法（First-Fit Decreasing） ==========
+function binPackPlain(plainCm) {
+  if (plainCm.length === 0) return [];
+
+  const sorted = [...plainCm].sort((a, b) => b - a);
+  const maxCap = toCm(getMaxLength());
+  const bins = [];
+
+  for (const item of sorted) {
+    let placed = false;
+    for (const bin of bins) {
+      if (bin.totalCm + item <= maxCap) {
+        bin.items.push(item);
+        bin.totalCm += item;
+        placed = true;
+        break;
+      }
+    }
+    if (!placed) {
+      bins.push({ items: [item], totalCm: item });
+    }
+  }
+
+  return bins;
+}
+
+// ========== 核心求解算法 ==========
+// 对一类起步弯的需求，用背包法逐个填充剩余直扶手
+function processCurvedGroup(plainCm, availableIndices, curvedCmList, type) {
+  const groups = [];
+  let avail = [...availableIndices];
+
+  for (const curvedCm of curvedCmList) {
+    const cap = toCm(getMaxLength()) - curvedCm;
+    const fill = knapsackFill(plainCm, avail, cap);
+
+    const totalCm = curvedCm + fill.totalCm;
+    const bestProd = findBestProduct(toM(totalCm), type);
+
+    groups.push({
+      type: type,
+      curvedCm: curvedCm,
+      plainCms: fill.selectedIndices.map(i => plainCm[i]),
+      totalCm: totalCm,
+      product: bestProd,
+      wasteCm: bestProd !== null ? (toCm(bestProd) - totalCm) : null,
+      feasible: bestProd !== null
+    });
+
+    avail = fill.remainingIndices;
+  }
+
+  return { groups, remainingIndices: avail };
+}
+
+// 完整策略：先处理第一类起步弯，再处理第二类，最后装箱剩余直扶手
+function runStrategy(plainCm, firstCurved, secondCurved, firstType, secondType) {
+  const initIndices = [...Array(plainCm.length).keys()];
+
+  const r1 = processCurvedGroup(plainCm, initIndices, firstCurved, firstType);
+  const r2 = processCurvedGroup(plainCm, r1.remainingIndices, secondCurved, secondType);
+
+  const allGroups = [...r1.groups, ...r2.groups];
+
+  // 剩余直扶手装箱
+  const remainingItems = r2.remainingIndices.map(i => plainCm[i]);
+  const bins = binPackPlain(remainingItems);
+  for (const bin of bins) {
+    const bestProd = findBestProduct(toM(bin.totalCm), 'plain');
+    allGroups.push({
+      type: 'plain',
+      curvedCm: null,
+      plainCms: bin.items,
+      totalCm: bin.totalCm,
+      product: bestProd,
+      wasteCm: bestProd !== null ? (toCm(bestProd) - bin.totalCm) : null,
+      feasible: bestProd !== null
+    });
+  }
+
+  return allGroups;
+}
+
+function totalWaste(groups) {
+  return groups.reduce((s, g) => s + (g.wasteCm || 0), 0);
+}
+
+function solve(demands) {
+  const plainCm = demands.plain.map(toCm);
+  const leftCm = demands.left.map(toCm);
+  const rightCm = demands.right.map(toCm);
+
+  // 尝试 6 种策略组合，取浪费最小的
+  const strategies = [
+    // 左优先、左降序、右降序
+    { f: [...leftCm].sort((a,b)=>b-a), s: [...rightCm].sort((a,b)=>b-a), ft: 'left', st: 'right' },
+    // 左优先、左升序、右降序
+    { f: [...leftCm].sort((a,b)=>a-b), s: [...rightCm].sort((a,b)=>b-a), ft: 'left', st: 'right' },
+    // 左优先、左降序、右升序
+    { f: [...leftCm].sort((a,b)=>b-a), s: [...rightCm].sort((a,b)=>a-b), ft: 'left', st: 'right' },
+    // 右优先、右降序、左降序
+    { f: [...rightCm].sort((a,b)=>b-a), s: [...leftCm].sort((a,b)=>b-a), ft: 'right', st: 'left' },
+    // 右优先、右升序、左降序
+    { f: [...rightCm].sort((a,b)=>a-b), s: [...leftCm].sort((a,b)=>b-a), ft: 'right', st: 'left' },
+    // 右优先、右降序、左升序
+    { f: [...rightCm].sort((a,b)=>b-a), s: [...leftCm].sort((a,b)=>a-b), ft: 'right', st: 'left' },
+  ];
+
+  let best = null, bestWaste = Infinity;
+  for (const s of strategies) {
+    const result = runStrategy(plainCm, s.f, s.s, s.ft, s.st);
+    const w = totalWaste(result);
+    if (w < bestWaste) {
+      best = result;
+      bestWaste = w;
+    }
+  }
+
+  return best;
+}
+
+// ========== UI渲染 ==========
+// 格式化米数显示
+function fmtM(cm) { return (cm === null || cm === undefined) ? '-' : (cm / 100).toFixed(2).replace(/\.?0+$/, ''); }
+
+// 快速统计（成品数量统计）
+function renderQuickStats(groups) {
+  const counts = {};
+  for (const g of groups) {
+    if (!g.feasible) continue;
+    const key = productLabel(g.product, g.type);
+    counts[key] = (counts[key] || 0) + 1;
+  }
+  const list = document.getElementById('quickStatsList');
+  if (Object.keys(counts).length === 0) {
+    document.getElementById('quickStats').classList.remove('show');
+    list.innerHTML = '';
+    return;
+  }
+  list.innerHTML = Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([label, count]) => `<div class="quick-stat-chip"><span>${label}</span><span class="stat-count">× ${count}</span></div>`)
+    .join('');
+  document.getElementById('quickStats').classList.add('show');
+}
+
+function clearAll() {
+  const rowsEl = document.getElementById('demandRows');
+  rowsEl.innerHTML = '';
+  addRow('', 'plain');
+  document.getElementById('resultContent').innerHTML = `
+    <div class="result-empty">
+      <div class="empty-icon">📐</div>
+      <p>添加客户需求后点击「智能计算」查看最优组合方案</p>
+    </div>`;
+  document.getElementById('summaryCard').hidden = true;
+  document.getElementById('errorMsg').classList.remove('show');
+  document.getElementById('quickStats').classList.remove('show');
+  document.getElementById('quickStatsList').innerHTML = '';
+}
+
+function loadExample() {
+  const rowsEl = document.getElementById('demandRows');
+  rowsEl.innerHTML = '';
+  const examples = [
+    ['1.1', 'plain'], ['1.2', 'plain'], ['2.1', 'left'],
+    ['2.3', 'left'], ['0.8', 'plain'], ['3.2', 'plain'],
+    ['1.5', 'right'], ['0.6', 'plain']
+  ];
+  examples.forEach(([val, type]) => {
+    rowsEl.appendChild(createDemandRow(val, type));
+  });
+  _renumber();
+  _updateCount();
+  document.getElementById('errorMsg').classList.remove('show');
+}
+
+function calculate() {
+  const errorEl = document.getElementById('errorMsg');
+  errorEl.classList.remove('show');
+
+  const parsed = getDemands();
+
+  const totalCount = parsed.plain.length + parsed.left.length + parsed.right.length;
+  if (totalCount === 0) {
+    errorEl.textContent = '⚠️ 请至少输入一个有效尺寸';
+    errorEl.classList.add('show');
+    return;
+  }
+
+  if (parsed.errors.length > 0) {
+    errorEl.innerHTML = `⚠️ 以下行输入无效已跳过：<br>${parsed.errors.map(e => `「${e}」`).join('、')}`;
+    errorEl.classList.add('show');
+  }
+
+  // 显示加载状态
+  document.getElementById('resultContent').innerHTML = '<div class="result-empty"><div class="empty-icon">⏳</div><p>正在计算最优组合方案...</p></div>';
+  document.getElementById('summaryCard').hidden = true;
+
+  setTimeout(() => {
+    const groups = solve(parsed);
+    renderResults(groups, parsed);
+  }, 50);
+}
+
+function renderResults(groups, parsed) {
+  const container = document.getElementById('resultContent');
+  const summaryCard = document.getElementById('summaryCard');
+  const statsBar = document.getElementById('statsBar');
+
+  if (groups.length === 0) {
+    container.innerHTML = `<div class="result-empty"><div class="empty-icon">🤔</div><p>无法生成有效组合方案</p></div>`;
+    summaryCard.hidden = true;
+    return;
+  }
+
+  // 统计
+  let totalNeededCm = 0, totalSoldCm = 0, totalWasteCm = 0;
+  let feasibleCount = 0, infeasibleCount = 0;
+  for (const g of groups) {
+    totalNeededCm += g.totalCm;
+    if (g.feasible) {
+      totalSoldCm += toCm(g.product);
+      totalWasteCm += g.wasteCm;
+      feasibleCount++;
+    } else {
+      infeasibleCount++;
+    }
+  }
+
+  // 更新上方快速统计
+  renderQuickStats(groups);
+
+  // 构建纯文本结果（用于复制）
+  let textResult = '【扶手长度智能组合结果】\n';
+  textResult += '━━━━━━━━━━━━━━━━━━━━\n\n';
+
+  // 渲染每组
+  let html = '<div class="group-list">';
+  groups.forEach((g, idx) => {
+    const num = idx + 1;
+    let fitClass = 'poor-fit';
+    if (!g.feasible) {
+      fitClass = 'overfit';
+    } else if (g.wasteCm <= toCm(0.2)) {
+      fitClass = 'best-fit';
+    } else if (g.wasteCm <= toCm(0.5)) {
+      fitClass = 'good-fit';
+    }
+
+    let wasteClass = 'good';
+    if (!g.feasible || g.wasteCm > toCm(0.5)) wasteClass = 'bad';
+    else if (g.wasteCm > toCm(0.2)) wasteClass = 'medium';
+
+    const typeClass = g.type;
+    const typeLabel = g.type === 'plain' ? '直扶手组' : g.type === 'left' ? '左起步弯组' : '右起步弯组';
+
+    // Items
+    let itemsHtml = '';
+    let itemsText = '';
+    if (g.curvedCm !== null && g.curvedCm !== undefined) {
+      const curvedLabel = fmtM(g.curvedCm) + '米' + (g.type === 'left' ? '+左起步' : '+右起步');
+      itemsHtml += `<span class="item-chip curved-piece">🔷 ${curvedLabel}</span>`;
+      itemsText = '  ' + curvedLabel;
+    }
+    for (const pc of (g.plainCms || [])) {
+      const plainLabel = fmtM(pc) + '米';
+      itemsHtml += `<span class="item-chip plain-piece">${plainLabel}</span>`;
+      itemsText += (itemsText ? ' + ' : '  ') + plainLabel;
+    }
+
+    const totalMStr = fmtM(g.totalCm);
+
+    let productHtml = '';
+    let productText = '';
+    if (g.feasible) {
+      const prodLabel = productLabel(g.product, g.type);
+      productHtml = `<span class="group-product">${prodLabel}</span>`;
+      productText = prodLabel;
+    } else {
+      productHtml = `<span style="color:#dc2626;font-weight:700;">⚠ 超出最大规格（需 ${totalMStr}米 > 4.5米）</span>`;
+      productText = '⚠ 超出最大规格(>4.5米)';
+    }
+
+    const wasteM = g.feasible ? fmtM(g.wasteCm) : '-';
+
+    html += `
+      <div class="group-card ${fitClass}">
+        <div class="group-header">
+          <div class="group-badge">
+            <span class="badge-num">${num}</span>
+            <span class="group-type-tag ${typeClass}">${typeLabel}</span>
+          </div>
+          ${g.feasible ? `<span class="group-waste ${wasteClass}">浪费 ${wasteM}米</span>` : `<span class="group-waste bad">无法匹配</span>`}
+        </div>
+        <div class="group-items">${itemsHtml}</div>
+        <div class="group-footer">
+          <span class="group-total">组合总需 <strong>${totalMStr}米</strong> <span class="group-arrow">→</span></span>
+          ${productHtml}
+        </div>
+      </div>`;
+
+    textResult += `第${num}组 [${typeLabel}]\n`;
+    textResult += itemsText + `\n`;
+    textResult += `总需求: ${totalMStr}米 → 销售: ${productText}`;
+    if (g.feasible) textResult += ` (浪费${wasteM}米)`;
+    textResult += `\n\n`;
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
+
+  // 汇总
+  const totalNeededM = fmtM(totalNeededCm);
+  const totalSoldM = fmtM(totalSoldCm);
+  const totalWasteM = fmtM(totalWasteCm);
+  const efficiency = totalSoldCm > 0 ? ((totalNeededCm / totalSoldCm) * 100).toFixed(1) : '0';
+
+  textResult += '━━━━━━━━━━━━━━━━━━━━\n';
+  textResult += `组合组数: ${groups.length}组\n`;
+  textResult += `客户总需求: ${totalNeededM}米\n`;
+  textResult += `实际销售总长: ${totalSoldM}米\n`;
+  textResult += `总浪费长度: ${totalWasteM}米\n`;
+  textResult += `材料利用率: ${efficiency}%\n`;
+  if (infeasibleCount > 0) textResult += `⚠ 超出规格组: ${infeasibleCount}组\n`;
+
+  // 保存文本结果供复制使用
+  window._lastCopyText = textResult;
+
+  statsBar.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-value">${groups.length}</div>
+      <div class="stat-label">组合组数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${totalNeededM}米</div>
+      <div class="stat-label">客户总需求</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${totalSoldM}米</div>
+      <div class="stat-label">实际销售总长</div>
+    </div>
+    <div class="stat-card waste">
+      <div class="stat-value">${totalWasteM}米</div>
+      <div class="stat-label">总浪费长度</div>
+    </div>
+    <div class="stat-card saved">
+      <div class="stat-value">${efficiency}%</div>
+      <div class="stat-label">材料利用率</div>
+    </div>
+  `;
+
+  if (infeasibleCount > 0) {
+    statsBar.innerHTML += `
+      <div class="stat-card" style="background:linear-gradient(135deg,#fef2f2,#fee2e2);border-color:#fecaca;">
+        <div class="stat-value" style="color:#dc2626;">${infeasibleCount}</div>
+        <div class="stat-label">⚠ 超出规格组</div>
+      </div>`;
+  }
+
+  document.getElementById('copyBtnRow').innerHTML = `
+    <button class="btn btn-secondary" onclick="copyResults()" style="font-size:13px;">📋 复制结果到剪贴板</button>`;
+
+  summaryCard.hidden = false;
+
+  // 保存历史记录
+  saveHistoryToStorage(groups, parsed);
+}
+
+async function copyResults() {
+  const text = window._lastCopyText || '';
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast('✅ 已复制结果到剪贴板！');
+  } catch {
+    // fallback: select and copy
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('✅ 已复制结果到剪贴板！');
+  }
+}
+
+// ========== Toast 提示 ==========
+let _toastTimer = null;
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  if (_toastTimer) clearTimeout(_toastTimer);
+  t.textContent = msg;
+  t.className = 'toast show' + (type === 'warn' ? ' warn' : '');
+  _toastTimer = setTimeout(() => { t.className = 'toast'; }, 2000);
+}
+
+// ========== 历史记录 ==========
+const HISTORY_KEY = 'handrail_calc_history';
+let _loadingFromHistory = false;
+
+function getCurrentRowsData() {
+  const rows = document.querySelectorAll('#demandRows .demand-row');
+  return Array.from(rows).map(row => ({
+    length: parseFloat(row.querySelector('input').value) || '',
+    type: row.querySelector('select').value
+  }));
+}
+
+function saveHistoryToStorage(groups, parsed) {
+  // 从历史记录加载数据时跳过自动保存，避免产生重复条目
+  if (_loadingFromHistory) {
+    _loadingFromHistory = false;
+    return;
+  }
+  const customer = document.getElementById('customerName').value.trim() || '未命名客户';
+  const now = new Date();
+  const totalNeededCm = groups.reduce((s, g) => s + g.totalCm, 0);
+  const totalSoldCm = groups.filter(g => g.feasible).reduce((s, g) => s + toCm(g.product), 0);
+  const record = {
+    id: Date.now().toString(),
+    date: now.toISOString(),
+    dateStr: now.toLocaleString('zh-CN'),
+    customer: customer,
+    rows: getCurrentRowsData(),
+    summary: {
+      groupCount: groups.length,
+      totalNeeded: fmtM(totalNeededCm),
+      efficiency: totalSoldCm > 0 ? ((totalNeededCm / totalSoldCm) * 100).toFixed(1) : '0'
+    }
+  };
+  let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+  history.unshift(record);
+  if (history.length > 50) history = history.slice(0, 50);
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  renderHistory();
+}
+
+function loadHistory() {
+  return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  const history = loadHistory();
+  if (history.length === 0) {
+    list.innerHTML = '<div class="history-empty">暂无历史记录</div>';
+    return;
+  }
+  list.innerHTML = history.map(item => `
+    <div class="history-item" onclick="loadHistoryRecord('${item.id}')">
+      <div class="history-title">
+        <span>${item.customer || '未命名客户'}</span>
+        <button class="history-btn-del" onclick="event.stopPropagation(); deleteHistory('${item.id}')">删除</button>
+      </div>
+      <div class="history-meta">${item.dateStr} · ${item.summary.groupCount}组 · 利用率${item.summary.efficiency}%</div>
+    </div>
+  `).join('');
+}
+
+function deleteHistory(id) {
+  if (!confirm('确定删除这条历史记录？')) return;
+  let history = loadHistory().filter(item => item.id !== id);
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  renderHistory();
+}
+
+function loadHistoryRecord(id) {
+  const record = loadHistory().find(item => item.id === id);
+  if (!record) return;
+  document.getElementById('customerName').value = record.customer || '';
+  const rowsEl = document.getElementById('demandRows');
+  rowsEl.innerHTML = '';
+  if (record.rows && record.rows.length > 0) {
+    record.rows.forEach(r => {
+      rowsEl.appendChild(createDemandRow(r.length, r.type, true));
+    });
+  } else {
+    addRow('', 'plain');
+  }
+  _renumber();
+  _updateCount();
+  _loadingFromHistory = true;
+  calculate();
+}
+
+// ========== 初始化 ==========
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date();
+  document.getElementById('calcDate').textContent = '计算日期：' + today.toLocaleDateString('zh-CN');
+  document.getElementById('displayUnit').value = UNIT;
+  renderSpecs();
+  updateTipBox();
+  addRow('', 'plain');
+  renderHistory();
+
+  const pasteArea = document.getElementById('pasteArea');
+  if (pasteArea) pasteArea.addEventListener('input', updatePastePreview);
+
+  // Close modal on overlay click
+  document.getElementById('pasteModal').addEventListener('click', (e) => {
+    if (e.target.id === 'pasteModal') closePasteModal();
+  });
+});
+</script>
+
+<div id="toast" class="toast"></div>
+
+</body>
+</html>
