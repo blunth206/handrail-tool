@@ -580,6 +580,15 @@ function doLogin() {
   const input = inputEl.value.trim();
   if (!input) { errEl.textContent = '请输入密码'; return; }
 
+  // 隐藏强制重置（输入特定代码可清除所有密码设置）
+  if (input === 'resetme') {
+    localStorage.removeItem(ADMIN_KEY);
+    errEl.textContent = '';
+    inputEl.value = '';
+    alert('✅ 密码已重置为默认值：' + DEFAULT_PASSWORD);
+    return;
+  }
+
   const result = isValidPassword(input);
 
   if (!result.valid) {
