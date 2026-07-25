@@ -1855,9 +1855,16 @@ function updateFSBtnIcon() {
 function toggleFullscreen() {
   if (isFullscreen()) {
     exitFullscreen();
-  } else {
-    requestFullscreen();
+    setTimeout(updateFSBtnIcon, 300);
+    return;
   }
+  if (!canFullscreen()) {
+    // iOS不支持全屏API，引导添加到桌面（PWA独立窗口即全屏）
+    showToast('iOS不支持网页全屏，请"添加到桌面"后使用，即为全屏模式', 'warn');
+    setTimeout(() => showIOSGuide(), 500);
+    return;
+  }
+  requestFullscreen();
   setTimeout(updateFSBtnIcon, 300);
 }
 
