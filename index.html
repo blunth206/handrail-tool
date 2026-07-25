@@ -2,8 +2,16 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>扶手长度智能组合工具</title>
+<meta name="description" content="输入客户需求尺寸，自动计算最优扶手组合方案">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="扶手计算器">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1e3a5f">
+<link rel="manifest" href="/handrail-tool/manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231e3a5f'/><text x='50' y='68' text-anchor='middle' font-size='50'>🪜</text></svg>">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif; background: #f0f4f8; min-height: 100vh; color: #1a202c; }
@@ -259,6 +267,33 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
 .sub-pwd-list mark { background: #fde68a; color: #92400e; border-radius: 2px; padding: 0 1px; }
 .sub-pwd-count { font-size: 10px; color: #94a3b8; text-align: center; padding: 4px 0; }
 .admin-panel { width: 340px; }
+
+/* 添加到桌面横幅 */
+.a2hs-banner { display: none; align-items: center; gap: 10px; background: linear-gradient(135deg, #1e3a5f, #2d5a87); color: #fff; padding: 10px 14px; margin: 0 auto; max-width: 460px; border-radius: 0 0 12px 12px; position: relative; z-index: 5; }
+.a2hs-banner.show { display: flex; }
+.a2hs-content { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.a2hs-icon { font-size: 28px; flex-shrink: 0; }
+.a2hs-text { min-width: 0; }
+.a2hs-title { font-size: 14px; font-weight: 700; }
+.a2hs-sub { font-size: 11px; opacity: 0.8; }
+.a2hs-btn { flex-shrink: 0; background: #fff; color: #1e3a5f; border: none; border-radius: 6px; padding: 6px 14px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.a2hs-btn:active { opacity: 0.8; }
+.a2hs-close { flex-shrink: 0; background: none; border: none; color: rgba(255,255,255,0.6); font-size: 16px; cursor: pointer; padding: 4px; }
+.a2hs-close:hover { color: #fff; }
+
+/* 全屏按钮 */
+.fs-btn { display: none; position: fixed; bottom: 20px; right: 16px; z-index: 999; width: 46px; height: 46px; border-radius: 50%; background: rgba(30,58,95,0.85); color: #fff; border: 1.5px solid rgba(255,255,255,0.3); font-size: 22px; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.2); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: transform 0.15s, background 0.15s; display: flex; align-items: center; justify-content: center; }
+.fs-btn:active { transform: scale(0.92); background: rgba(30,58,95,1); }
+.fs-btn.hidden { display: none !important; }
+@media (min-width: 769px) { .fs-btn { display: flex; } } /* PC也显示 */
+@media (max-width: 768px) { .fs-btn { display: flex; } }
+
+/* iOS添加桌面引导 */
+.ios-guide { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 10000; flex-direction: column; align-items: center; padding-top: 10px; }
+.ios-guide.show { display: flex; }
+.ios-guide-box { background: #fff; border-radius: 12px; padding: 18px 22px; box-shadow: 0 8px 30px rgba(0,0,0,0.25); text-align: center; font-size: 14px; color: #1e293b; line-height: 2; margin: 0 20px; }
+.ios-guide-arrow { font-size: 32px; animation: bounce-up 1.5s ease infinite; }
+@keyframes bounce-up { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
 </style>
 </head>
 <body>
@@ -309,6 +344,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
 </div>
 
 <div class="main-content" id="mainContent">
+
+<!-- 添加到桌面提示横幅 -->
+<div class="a2hs-banner" id="a2hsBanner">
+  <div class="a2hs-content">
+    <div class="a2hs-icon">🪜</div>
+    <div class="a2hs-text">
+      <div class="a2hs-title">添加到桌面</div>
+      <div class="a2hs-sub">一键打开，使用更方便</div>
+    </div>
+  </div>
+  <button class="a2hs-btn" id="a2hsBtn" onclick="installPWA()">添加</button>
+  <button class="a2hs-close" onclick="closeA2HS()">✕</button>
+</div>
+
 <div class="header">
   <button class="logout-btn" id="logoutBtn" title="退出登录">↪</button>
   <h1>🪜 扶手长度智能组合工具</h1>
@@ -1758,6 +1807,119 @@ function loadHistoryRecord(id) {
   calculate();
 }
 
+// ========== 全屏功能 ==========
+let _fsAutoTriggered = false;
+
+function canFullscreen() {
+  const d = document;
+  return !!(d.fullscreenEnabled || d.webkitFullscreenEnabled || d.msFullscreenEnabled);
+}
+
+function isFullscreen() {
+  const d = document;
+  return !!(d.fullscreenElement || d.webkitFullscreenElement || d.msFullscreenElement);
+}
+
+function requestFullscreen() {
+  const el = document.documentElement;
+  if (el.requestFullscreen) el.requestFullscreen().catch(()=>{});
+  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  else if (el.msRequestFullscreen) el.msRequestFullscreen();
+}
+
+function exitFullscreen() {
+  const d = document;
+  if (d.exitFullscreen) d.exitFullscreen().catch(()=>{});
+  else if (d.webkitExitFullscreen) d.webkitExitFullscreen();
+  else if (d.msExitFullscreen) d.msExitFullscreen();
+}
+
+function updateFSBtnIcon() {
+  const btn = document.getElementById('fsBtn');
+  if (!btn) return;
+  btn.style.opacity = isFullscreen() ? '0.5' : '1';
+}
+
+function toggleFullscreen() {
+  if (isFullscreen()) {
+    exitFullscreen();
+  } else {
+    requestFullscreen();
+  }
+  setTimeout(updateFSBtnIcon, 300);
+}
+
+// 首次交互时自动全屏（仅手机端，非独立窗口模式）
+function tryAutoFullscreen() {
+  if (_fsAutoTriggered) return;
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
+  if (window.innerWidth > 768) return;
+  if (!canFullscreen()) return;
+  _fsAutoTriggered = true;
+  requestFullscreen();
+  setTimeout(updateFSBtnIcon, 300);
+  document.removeEventListener('click', tryAutoFullscreen);
+  document.removeEventListener('touchstart', tryAutoFullscreen);
+}
+
+document.addEventListener('fullscreenchange', updateFSBtnIcon);
+document.addEventListener('webkitfullscreenchange', updateFSBtnIcon);
+
+// ========== 添加到桌面（PWA Install） ==========
+let _deferredPrompt = null;
+let _a2hsDismissed = false;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  _deferredPrompt = e;
+  if (isLoggedIn() && !_a2hsDismissed) {
+    showA2HSBanner();
+  }
+});
+
+function showA2HSBanner() {
+  const banner = document.getElementById('a2hsBanner');
+  if (banner && !_a2hsDismissed && _deferredPrompt) {
+    banner.classList.add('show');
+  }
+}
+
+function closeA2HS() {
+  _a2hsDismissed = true;
+  const banner = document.getElementById('a2hsBanner');
+  if (banner) banner.classList.remove('show');
+}
+
+function installPWA() {
+  if (_deferredPrompt) {
+    _deferredPrompt.prompt();
+    _deferredPrompt.userChoice.then(() => {
+      _deferredPrompt = null;
+      closeA2HS();
+    });
+  }
+}
+
+// iOS Safari 添加桌面引导
+function showIOSGuide() {
+  const ua = navigator.userAgent;
+  const isIOS = /iPhone|iPad|iPod/.test(ua);
+  const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  if (isIOS && isSafari && !isStandalone && !_a2hsDismissed && isLoggedIn()) {
+    setTimeout(() => {
+      const guide = document.getElementById('iosGuide');
+      if (guide) guide.classList.add('show');
+    }, 2000);
+  }
+}
+
+function closeIOSGuide() {
+  _a2hsDismissed = true;
+  const guide = document.getElementById('iosGuide');
+  if (guide) guide.classList.remove('show');
+}
+
 // ========== 初始化 ==========
 document.addEventListener('DOMContentLoaded', () => {
   const today = new Date();
@@ -1775,12 +1937,45 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('pasteModal').addEventListener('click', (e) => {
     if (e.target.id === 'pasteModal') closePasteModal();
   });
+
+  // 全屏按钮备用监听
+  document.getElementById('fsBtn').addEventListener('click', toggleFullscreen);
+
+  // 自动全屏：首次点击/触摸触发（手机端）
+  document.addEventListener('click', tryAutoFullscreen, { once: false });
+  document.addEventListener('touchstart', tryAutoFullscreen, { once: false });
+
+  // iOS Safari 添加到桌面引导
+  setTimeout(() => showIOSGuide(), 1500);
+
+  // 登录后显示A2HS横幅
+  if (isLoggedIn()) showA2HSBanner();
+  const loginObserver = new MutationObserver(() => {
+    if (isLoggedIn()) {
+      showA2HSBanner();
+      loginObserver.disconnect();
+    }
+  });
+  const overlay = document.getElementById('loginOverlay');
+  if (overlay) loginObserver.observe(overlay, { attributes: true, attributeFilter: ['class'] });
 });
 </script>
 
 <div id="toast" class="toast"></div>
 
 </div><!-- /main-content -->
+
+<!-- 全屏按钮（仅手机端显示） -->
+<button class="fs-btn" id="fsBtn" onclick="toggleFullscreen()" title="全屏模式">⛶</button>
+
+<!-- iOS添加到桌面引导提示 -->
+<div class="ios-guide" id="iosGuide" onclick="closeIOSGuide()">
+  <div class="ios-guide-box">
+    <div class="ios-guide-arrow">↑</div>
+    <div>点击 Safari 底部 <b>分享</b> 按钮</div>
+    <div>选择 <b>添加到桌面</b></div>
+  </div>
+</div>
 
 </body>
 </html>

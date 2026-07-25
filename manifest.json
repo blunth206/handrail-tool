@@ -1,0 +1,17 @@
+{
+  "name": "扶手长度智能组合工具",
+  "short_name": "扶手计算器",
+  "description": "输入客户需求尺寸，自动计算最优扶手组合方案",
+  "start_url": "/handrail-tool/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1e3a5f",
+  "theme_color": "#1e3a5f",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231e3a5f'/><text x='50' y='68' text-anchor='middle' font-size='50'>🪜</text></svg>",
+      "sizes": "100x100",
+      "type": "image/svg+xml"
+    }
+  ]
+}
