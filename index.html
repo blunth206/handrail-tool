@@ -1822,11 +1822,6 @@ function loadHistoryRecord(id) {
 // ========== 全屏功能 ==========
 let _fsAutoTriggered = false;
 
-function canFullscreen() {
-  const d = document;
-  return !!(d.fullscreenEnabled || d.webkitFullscreenEnabled || d.msFullscreenEnabled);
-}
-
 function isFullscreen() {
   const d = document;
   return !!(d.fullscreenElement || d.webkitFullscreenElement || d.msFullscreenElement);
@@ -1834,15 +1829,22 @@ function isFullscreen() {
 
 function requestFullscreen() {
   const el = document.documentElement;
-  if (el.requestFullscreen) el.requestFullscreen().catch(()=>{});
-  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-  else if (el.msRequestFullscreen) el.msRequestFullscreen();
+  // 安卓优先尝试 webkit（兼容华为等机型），再尝试标准API
+  if (el.webkitRequestFullscreen) {
+    el.webkitRequestFullscreen();
+  } else if (el.requestFullscreen) {
+    el.requestFullscreen().catch(function(e) {
+      showToast('全屏失败：' + (e.message || '不支持'), 'warn');
+    });
+  } else if (el.msRequestFullscreen) {
+    el.msRequestFullscreen();
+  }
 }
 
 function exitFullscreen() {
   const d = document;
-  if (d.exitFullscreen) d.exitFullscreen().catch(()=>{});
-  else if (d.webkitExitFullscreen) d.webkitExitFullscreen();
+  if (d.webkitExitFullscreen) d.webkitExitFullscreen();
+  else if (d.exitFullscreen) d.exitFullscreen().catch(function(){});
   else if (d.msExitFullscreen) d.msExitFullscreen();
 }
 
@@ -1858,14 +1860,8 @@ function toggleFullscreen() {
     setTimeout(updateFSBtnIcon, 300);
     return;
   }
-  if (!canFullscreen()) {
-    // iOS不支持全屏API，引导添加到桌面（PWA独立窗口即全屏）
-    showToast('iOS不支持网页全屏，请"添加到桌面"后使用，即为全屏模式', 'warn');
-    setTimeout(() => showIOSGuide(), 500);
-    return;
-  }
   requestFullscreen();
-  setTimeout(updateFSBtnIcon, 300);
+  setTimeout(updateFSBtnIcon, 400);
 }
 
 // 首次交互时自动全屏（仅手机端，非独立窗口模式）
@@ -1873,10 +1869,9 @@ function tryAutoFullscreen() {
   if (_fsAutoTriggered) return;
   if (window.matchMedia('(display-mode: standalone)').matches) return;
   if (window.innerWidth > 768) return;
-  if (!canFullscreen()) return;
   _fsAutoTriggered = true;
   requestFullscreen();
-  setTimeout(updateFSBtnIcon, 300);
+  setTimeout(updateFSBtnIcon, 500);
   document.removeEventListener('click', tryAutoFullscreen);
   document.removeEventListener('touchstart', tryAutoFullscreen);
 }
