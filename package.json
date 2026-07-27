@@ -1,0 +1,20 @@
+{
+  "name": "handrail-tool",
+  "version": "1.0.0",
+  "description": "扶手长度重组工具",
+  "main": "index.html",
+  "scripts": {
+    "copy": "copy index.html www\\index.html && copy manifest.json www\\manifest.json && xcopy icons www\\icons\\ /E /Y",
+    "sync": "npm run copy && npx cap sync",
+    "open": "npx cap open android"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/cli": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
+    "sharp": "^0.35.3"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "appId": "com.handrail.tool",
+  "appName": "扶手长度重组工具",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "buildOptions": {
+      "keystorePath": "",
+      "keystorePassword": "",
+      "keyAlias": "",
+      "keyPassword": "",
+      "releaseType": "AAB"
+    }
+  }
+}

@@ -1,7 +1,8 @@
-# 备份文件
-*.bak.*
-
-# 系统文件
 node_modules/
-.DS_Store
-Thumbs.db
+android/.gradle/
+android/app/build/
+android/build/
+android/captures/
+*.apk
+*.aab
+www/
