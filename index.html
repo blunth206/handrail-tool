@@ -515,8 +515,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
         把客户发来的尺寸文字粘贴到下面，支持多种格式：<br>
         • 3.5米 / 3.5m / 350cm（3位数以上默认为mm）<br>
         • 3.5米左起步弯 / 3.5左 / 左起步 3.5<br>
-        • 3.5右 / 3.5米右起步弯 / 1700（自动识别4位数=毫米）<br>
-        • 多个尺寸可用空格、逗号或换行分隔<br>
+        • 3.5右 / 3.5米右起步弯<br>
+        • 多个尺寸可用空格、逗号、+ 或换行分隔<br>
+        <b>• 条件识别：</b>支持"其中/里面/里面"触发，例如"其中1.3米是直扶手，其他都是接右起步"、"里面2.6为左其余为右"、"...+右起步"<br>
         <span style="color:#6b7280;font-size:10px;">ⓘ 识别后可在右上角×删除错误项</span>
       </div>
       <textarea class="paste-area" id="pasteArea" placeholder="例如：&#10;3.5米左起步弯&#10;2.8右&#10;1.2, 1.5m"></textarea>
@@ -1183,8 +1184,12 @@ function closePasteModal() {
 }
 
 function parsePastedText(text) {
+  // === 分离条件语句与数值部分 ===
+  // 支持："...其中1.3米是直扶手，其他都是接右起步"、"4+3.6=29.5，里面2.6为左其余是右"
+  const { valueText, condText } = _splitCondition(text);
+
   // 预处理：统一替换中文单位/标点
-  let normalized = text
+  let normalized = valueText
     .replace(/[，,;；]/g, ' ')
     .replace(/毫米/g, 'mm')
     .replace(/厘米/g, 'cm')
@@ -1194,6 +1199,7 @@ function parsePastedText(text) {
     .replace(/右起步弯/g, '右')
     .replace(/起步弯/g, '')
     .replace(/\+/g, ' ')
+    .replace(/=\d+(?:\.\d+)?/g, ' ')
     .replace(/直扶手/g, '直');
 
   const tokens = normalized.split(/[\s\n\r\t]+/).filter(t => t);
@@ -1218,14 +1224,143 @@ function parsePastedText(text) {
 
     if (isNaN(val) || val <= 0) continue;
 
+    // 纯数值项先标记为 plain，后续由条件覆盖
     let type = 'plain';
     const lower = token.toLowerCase();
+    // 数值 token 中仍可含方向关键词（如 "3.5右"）
     if (lower.includes('左')) type = 'left';
     else if (lower.includes('右')) type = 'right';
 
     rows.push({ length: val, type });
   }
+
+  // === 解析条件语句，覆盖类型 ===
+  if (condText) {
+    const cond = _parseConditions(condText);
+    if (cond.assignments.size > 0 || cond.defaultType) {
+      const EPS = 0.015; // 容忍浮点误差
+      for (const row of rows) {
+        // 按取值匹配精确赋值
+        let found = false;
+        for (const [key, cType] of cond.assignments) {
+          if (Math.abs(row.length - key) < EPS) {
+            row.type = cType;
+            found = true;
+            break;
+          }
+        }
+        // 未精确匹配的套用默认规则
+        if (!found && cond.defaultType) {
+          row.type = cond.defaultType;
+        }
+      }
+    }
+  }
+
   return rows;
+}
+
+// 把用户输入拆成"数值部分"和"条件部分"
+// 触发关键词：其中、里面、里面；兜底：都是、X米是...
+function _splitCondition(text) {
+  const primary = ['其中', '里面', '里面'];
+  let sepIdx = -1, sepLen = 0;
+  for (const m of primary) {
+    const idx = text.lastIndexOf(m);
+    if (idx !== -1 && idx > sepIdx) {
+      sepIdx = idx;
+      sepLen = m.length;
+    }
+  }
+  if (sepIdx !== -1) {
+    return { valueText: text.slice(0, sepIdx), condText: text.slice(sepIdx + sepLen) };
+  }
+
+  // 兜底1："...都是直扶手"
+  const allAreRe = /都是([\s\S]*)$/i;
+  const am = text.match(allAreRe);
+  if (am) {
+    return { valueText: text.slice(0, am.index), condText: am[1] };
+  }
+
+  // 兜底2："1.3米是直扶手"（把数字+单位+是之前的部分归还数值）
+  const assignSepRe = /(\d+(?:\.\d+)?(?:m|mm|cm|米)?\s*)是([\s\S]*)$/i;
+  const sm = text.match(assignSepRe);
+  if (sm) {
+    return { valueText: text.slice(0, sm.index + sm[1].length), condText: sm[2] };
+  }
+
+  return { valueText: text, condText: '' };
+}
+
+// 解析条件语句（原始文本，不经数值预处理）
+// 返回 { assignments: Map<number, string>, defaultType: string|null }
+function _parseConditions(condText) {
+  const result = { assignments: new Map(), defaultType: null };
+  if (!condText) return result;
+
+  // 先做轻量规范化（不替换方向关键词，保留自然语义）
+  let norm = condText
+    .replace(/[，,]/g, ' ')
+    .replace(/\+/g, ' ')
+    .replace(/毫米/g, 'mm')
+    .replace(/厘米/g, 'cm')
+    .replace(/公分/g, 'cm')
+    .replace(/米/g, 'm')
+    .replace(/直扶手/g, '直')
+    .replace(/左起步/g, '左')
+    .replace(/右起步/g, '右');
+
+  /**
+   * 从一段文本中识别类型关键词
+   * @param {string} s
+   * @returns {'plain'|'left'|'right'|null}
+   */
+  function classify(s) {
+    // 按优先级：先判断起步弯方向，再判断直扶手
+    if (/左/g.test(s)) return 'left';
+    if (/右/g.test(s)) return 'right';
+    if (/直/g.test(s)) return 'plain';
+    return null;
+  }
+
+  // 1) 匹配精确赋值："1.3米是直扶手"、"2.6接右"、"3.5为左起步"、"1.3+右"
+  const assignRe = /(\d+(?:\.\d+)?)\s*(?:m|mm|cm)?\s*[是为接\+]\s*(直|左|右)/g;
+  let m;
+  while ((m = assignRe.exec(norm)) !== null) {
+    let val = parseFloat(m[1]);
+    if (isNaN(val)) continue;
+    // 如果紧跟 "mm""cm""m" 的完整判断由 regex 可选单位覆盖；否则按数值大小推断
+    const before = norm.slice(Math.max(0, m.index - 4), m.index);
+    if (!/[cm]m\s*$/i.test(before) && val >= 100) val /= 1000;
+    const cType = classify(m[2]) || 'plain';
+    result.assignments.set(val, cType);
+  }
+
+  // 2) "除了1.3为左外，其余都接右" / "除了X是Y，其他Z"
+  const exceptRe = /除了\s*(\d+(?:\.\d+)?)\s*(?:m|mm|cm)?\s*[是为接\+]\s*(直|左|右)\s*(?:外|以外)?\s*[,，]?\s*(?:其余|剩下|其他|全部|都)\s*(?:是|为|接\+)?\s*(直|左|右)/;
+  const em = norm.match(exceptRe);
+  if (em) {
+    let val = parseFloat(em[1]);
+    const beforeEm = norm.slice(Math.max(0, em.index - 4), em.index);
+    if (!/[cm]m\s*$/i.test(beforeEm) && val >= 100) val /= 1000;
+    const excType = classify(em[2]) || 'plain';
+    result.assignments.set(val, excType);
+    const defType = classify(em[3]);
+    if (defType) result.defaultType = defType;
+  }
+
+  // 3) 默认规则："其他都接右起步"、"其余为左"、"剩下的是直扶手"
+  if (!result.defaultType) {
+    const defaultRe = /(?:其他|其余|剩下|都是|全部|都)\s*(?:是|为|接\+)?\s*(直|左|右)/;
+    const dm = norm.match(defaultRe);
+    if (dm) {
+      const dt = classify(dm[1]);
+      if (dt) result.defaultType = dt;
+    }
+  }
+
+  return result;
 }
 
 // 从粘贴文本中提取客户姓名（不影响尺寸解析，仅用于自动填入）
