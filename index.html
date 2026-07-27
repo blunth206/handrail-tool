@@ -183,6 +183,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
 .group-card.good-fit { border-color: #fde68a; background: #fffdf5; }
 .group-card.poor-fit { border-color: #fecaca; background: #fff5f5; }
 .group-card.overfit { border-color: #ef4444; background: #fef2f2; }
+.group-card.stock-unavailable { border-color: #fbbf24; background: #fffbeb; }
 .group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 6px; }
 .group-badge { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; }
 .group-badge .badge-num { background: #1e3a5f; color: #fff; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
@@ -327,7 +328,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
     </div>
     <div class="login-input-group">
       <label class="login-remember">
-        <input type="checkbox" id="rememberPwd" onchange="onRememberChange()">
+        <input type="checkbox" id="rememberPwd" onchange="onRememberChange()" checked>
         <span>记住密码</span>
       </label>
     </div>
@@ -984,11 +985,29 @@ function getMaxLength() {
 function toCm(m) { return Math.round(m * 100); }
 function toM(cm) { return cm / 100; }
 
-function findBestProduct(totalNeeded, type) {
+// 检查某规格是否还有库存可用（stockUsage: { plain:{idx:used}, left:{...}, right:{...} }）
+function _canUseStock(type, idx, stockUsage) {
+  if (!stockUsage) return true;
+  const conf = SPEC_CONFIG[type] || DEFAULT_SPECS[type];
+  if (!conf.stocks) return true;
+  const stock = conf.stocks[idx];
+  if (stock === null) return true;
+  if (stock === 0) return false;
+  const used = stockUsage[type][idx] || 0;
+  return used < stock;
+}
+
+function _useStock(type, idx, stockUsage) {
+  if (!stockUsage) return;
+  stockUsage[type][idx] = (stockUsage[type][idx] || 0) + 1;
+}
+
+function findBestProduct(totalNeeded, type, stockUsage) {
   const conf = SPEC_CONFIG[type];
   const pairs = conf.lengths.map((len, idx) => [len, idx]).sort((a, b) => a[0] - b[0]);
   for (let [len, idx] of pairs) {
     if (conf.stocks && conf.stocks[idx] === 0) continue;
+    if (!_canUseStock(type, idx, stockUsage)) continue; // 数量库存限制
     if (len >= totalNeeded - 0.001) return len;
   }
   return null;
@@ -1274,10 +1293,7 @@ function applyPasteRows() {
     return;
   }
   const rowsEl = document.getElementById('demandRows');
-  if (rowsEl.children.length === 1) {
-    const firstInput = rowsEl.children[0].querySelector('input');
-    if (!firstInput.value.trim()) rowsEl.innerHTML = '';
-  }
+  rowsEl.innerHTML = ''; // 每次粘贴识别都清空旧数据，重新添加
   rows.forEach(r => {
     rowsEl.appendChild(createDemandRow(r.length, r.type));
   });
@@ -1489,7 +1505,7 @@ function binPackPlain(plainCm) {
 
 // ========== 核心求解算法 ==========
 // 对一类起步弯的需求，用背包法逐个填充剩余直扶手
-function processCurvedGroup(plainCm, availableIndices, curvedCmList, type) {
+function processCurvedGroup(plainCm, availableIndices, curvedCmList, type, stockUsage) {
   const groups = [];
   let avail = [...availableIndices];
   const maxCap = toCm(getMaxLength());
@@ -1504,6 +1520,7 @@ function processCurvedGroup(plainCm, availableIndices, curvedCmList, type) {
         totalCm: curvedCm,
         product: null,
         wasteCm: null,
+        reason: 'oversize',
         feasible: false
       });
       continue;
@@ -1523,6 +1540,7 @@ function processCurvedGroup(plainCm, availableIndices, curvedCmList, type) {
       if (conf.stocks) {
         const idx = conf.lengths.indexOf(prodLen);
         if (conf.stocks[idx] === 0) continue;          // 缺货
+        if (!_canUseStock(type, idx, stockUsage)) continue; // 库存数量不足
       }
 
       const cap = prodCm - curvedCm;
@@ -1537,7 +1555,7 @@ function processCurvedGroup(plainCm, availableIndices, curvedCmList, type) {
       }
     }
 
-    // 如果连最小规格都装不下弯管，则该弯管无法匹配
+    // 如果连最小规格都装不下弯管（或可用规格库存耗尽），则该弯管无法匹配
     if (bestProd === null) {
       groups.push({
         type: type,
@@ -1546,10 +1564,14 @@ function processCurvedGroup(plainCm, availableIndices, curvedCmList, type) {
         totalCm: curvedCm,
         product: null,
         wasteCm: null,
+        reason: 'no_product',
         feasible: false
       });
       continue;
     }
+
+    const bestIdx = conf.lengths.indexOf(bestProd);
+    _useStock(type, bestIdx, stockUsage); // 扣减库存
 
     groups.push({
       type: type,
@@ -1570,9 +1592,10 @@ function processCurvedGroup(plainCm, availableIndices, curvedCmList, type) {
 // 完整策略：先处理第一类起步弯，再处理第二类，最后装箱剩余直扶手
 function runStrategy(plainCm, firstCurved, secondCurved, firstType, secondType) {
   const initIndices = [...Array(plainCm.length).keys()];
+  const stockUsage = { plain: {}, left: {}, right: {} }; // 每种策略独立计数
 
-  const r1 = processCurvedGroup(plainCm, initIndices, firstCurved, firstType);
-  const r2 = processCurvedGroup(plainCm, r1.remainingIndices, secondCurved, secondType);
+  const r1 = processCurvedGroup(plainCm, initIndices, firstCurved, firstType, stockUsage);
+  const r2 = processCurvedGroup(plainCm, r1.remainingIndices, secondCurved, secondType, stockUsage);
 
   const allGroups = [...r1.groups, ...r2.groups];
 
@@ -1580,7 +1603,7 @@ function runStrategy(plainCm, firstCurved, secondCurved, firstType, secondType) 
   const remainingItems = r2.remainingIndices.map(i => plainCm[i]);
   const bins = binPackPlain(remainingItems);
   for (const bin of bins) {
-    const bestProd = findBestProduct(toM(bin.totalCm), 'plain');
+    const bestProd = findBestProduct(toM(bin.totalCm), 'plain', stockUsage);
     allGroups.push({
       type: 'plain',
       curvedCm: null,
@@ -1728,15 +1751,19 @@ function renderResults(groups, parsed) {
 
   // 统计
   let totalNeededCm = 0, totalSoldCm = 0, totalWasteCm = 0;
-  let feasibleCount = 0, infeasibleCount = 0;
+  let feasibleNeededCm = 0; // 只统计可行组的需求，用于计算利用率
+  let feasibleCount = 0, oversizeCount = 0, noStockCount = 0;
   for (const g of groups) {
     totalNeededCm += g.totalCm;
     if (g.feasible) {
+      feasibleNeededCm += g.totalCm;
       totalSoldCm += toCm(g.product);
       totalWasteCm += g.wasteCm;
       feasibleCount++;
+    } else if (g.reason === 'oversize') {
+      oversizeCount++;
     } else {
-      infeasibleCount++;
+      noStockCount++;
     }
   }
 
@@ -1753,7 +1780,7 @@ function renderResults(groups, parsed) {
     const num = idx + 1;
     let fitClass = 'poor-fit';
     if (!g.feasible) {
-      fitClass = 'overfit';
+      fitClass = g.reason === 'oversize' ? 'overfit' : 'stock-unavailable';
     } else if (g.wasteCm <= toCm(0.2)) {
       fitClass = 'best-fit';
     } else if (g.wasteCm <= toCm(0.5)) {
@@ -1789,9 +1816,13 @@ function renderResults(groups, parsed) {
       const prodLabel = productLabel(g.product, g.type);
       productHtml = `<span class="group-product">${prodLabel}</span>`;
       productText = prodLabel;
+    } else if (g.reason === 'oversize') {
+      const maxLenStr = getMaxLength().toFixed(1).replace(/\.0$/, '');
+      productHtml = `<span style="color:#dc2626;font-weight:700;">⚠ 超出最大规格（需 ${totalMStr}米 > ${maxLenStr}米）</span>`;
+      productText = '⚠ 超出最大规格(>' + maxLenStr + '米)';
     } else {
-      productHtml = `<span style="color:#dc2626;font-weight:700;">⚠ 超出最大规格（需 ${totalMStr}米 > 4.5米）</span>`;
-      productText = '⚠ 超出最大规格(>4.5米)';
+      productHtml = `<span style="color:#d97706;font-weight:700;">⚠ 无可用规格（库存不足或缺货）</span>`;
+      productText = '⚠ 无可用规格';
     }
 
     const wasteM = g.feasible ? fmtM(g.wasteCm) : '-';
@@ -1826,7 +1857,8 @@ function renderResults(groups, parsed) {
   const totalNeededM = fmtM(totalNeededCm);
   const totalSoldM = fmtM(totalSoldCm);
   const totalWasteM = fmtM(totalWasteCm);
-  const efficiency = totalSoldCm > 0 ? ((totalNeededCm / totalSoldCm) * 100).toFixed(1) : '0';
+  // 利用率只统计可行组：可行组总需求 / 销售成品总长
+  const efficiency = totalSoldCm > 0 ? ((feasibleNeededCm / totalSoldCm) * 100).toFixed(1) : '0';
 
   textResult += '━━━━━━━━━━━━━━━━━━━━\n';
   textResult += `组合组数: ${groups.length}组\n`;
@@ -1834,7 +1866,8 @@ function renderResults(groups, parsed) {
   textResult += `实际销售总长: ${totalSoldM}米\n`;
   textResult += `总浪费长度: ${totalWasteM}米\n`;
   textResult += `材料利用率: ${efficiency}%\n`;
-  if (infeasibleCount > 0) textResult += `⚠ 超出规格组: ${infeasibleCount}组\n`;
+  if (oversizeCount > 0) textResult += `⚠ 超出规格组: ${oversizeCount}组\n`;
+  if (noStockCount > 0) textResult += `⚠ 库存不足组: ${noStockCount}组\n`;
 
   // 保存文本结果供复制使用
   window._lastCopyText = textResult;
@@ -1862,11 +1895,18 @@ function renderResults(groups, parsed) {
     </div>
   `;
 
-  if (infeasibleCount > 0) {
+  if (oversizeCount > 0) {
     statsBar.innerHTML += `
       <div class="stat-card" style="background:linear-gradient(135deg,#fef2f2,#fee2e2);border-color:#fecaca;">
-        <div class="stat-value" style="color:#dc2626;">${infeasibleCount}</div>
-        <div class="stat-label">⚠ 超出规格组</div>
+        <div class="stat-value" style="color:#dc2626;">${oversizeCount}</div>
+        <div class="stat-label">⚠ 超出规格</div>
+      </div>`;
+  }
+  if (noStockCount > 0) {
+    statsBar.innerHTML += `
+      <div class="stat-card" style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:#fcd34d;">
+        <div class="stat-value" style="color:#d97706;">${noStockCount}</div>
+        <div class="stat-label">⚠ 库存不足</div>
       </div>`;
   }
 
@@ -1917,8 +1957,16 @@ function getCurrentRowsData() {
   const rows = document.querySelectorAll('#demandRows .demand-row');
   return Array.from(rows).map(row => ({
     length: parseFloat(row.querySelector('input').value) || '',
-    type: row.querySelector('select').value
+    type: row.querySelector('select').value,
+    unit: UNIT // 保存当前显示单位，加载时做正确转换
   }));
+}
+
+// 兼容旧历史记录：没有 unit 字段时，根据数值推断原单位
+function _inferHistoryUnit(length) {
+  if (typeof length !== 'number' || isNaN(length)) return 'm';
+  if (length >= 100) return 'mm'; // 旧数据在 mm 模式下保存的显示值
+  return 'm';                    // 旧数据默认按米处理
 }
 
 function saveHistoryToStorage(groups, parsed) {
@@ -1987,7 +2035,12 @@ function loadHistoryRecord(id) {
   rowsEl.innerHTML = '';
   if (record.rows && record.rows.length > 0) {
     record.rows.forEach(r => {
-      rowsEl.appendChild(createDemandRow(r.length, r.type, true));
+      const savedUnit = r.unit || _inferHistoryUnit(r.length);
+      let mVal;
+      if (savedUnit === 'cm') mVal = r.length / 100;
+      else if (savedUnit === 'mm') mVal = r.length / 1000;
+      else mVal = r.length;
+      rowsEl.appendChild(createDemandRow(mVal, r.type, true));
     });
   } else {
     addRow('', 'plain');
