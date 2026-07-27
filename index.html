@@ -116,21 +116,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
 .unit-selector label { font-size: 12px; color: #64748b; }
 .unit-selector select { border: 1.5px solid #e2e8f0; border-radius: 6px; padding: 6px 8px; font-size: 14px; font-family: inherit; background: #fff; cursor: pointer; color: #475569; min-height: 36px; min-width: 100px; appearance: auto; -webkit-appearance: auto; }
 .unit-selector select:focus { outline: none; border-color: #3b82f6; }
-.products-ref { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
-.products-ref .prod-col { background: #f8fafc; border-radius: 8px; padding: 8px 10px; border: 1.5px solid #e2e8f0; }
-.products-ref .prod-col .col-label { font-size: 14px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
-.products-ref .prod-col .col-label input { width: 100%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #64748b; padding: 0; }
-.products-ref .prod-col .spec-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.products-ref .prod-col .prod-chip { display: inline-flex; align-items: center; gap: 6px; background: #e0e7ff; color: #3730a3; padding: 6px 8px; border-radius: 10px; font-size: clamp(13px, 4.8vw, 20px); font-weight: 600; margin: 2px 2px; white-space: nowrap; cursor: default; border: 2px solid transparent; }
-.products-ref .prod-col .prod-chip.out-of-stock { background: #fee2e2; color: #991b1b; text-decoration: line-through; border-color: #fca5a5; }
+.products-ref { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-bottom: 8px; }
+.products-ref .prod-col { background: #f8fafc; border-radius: 8px; padding: 8px 6px; border: 1.5px solid #e2e8f0; min-width: 0; }
+.products-ref .prod-col .col-label { font-size: clamp(11px, 3.5vw, 14px); font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+.products-ref .prod-col .col-label input { width: 100%; border: none; background: transparent; font-size: inherit; font-weight: 700; color: #64748b; padding: 0; }
+.products-ref .prod-col .spec-chips { display: flex; flex-direction: column; gap: 5px; }
+.products-ref .prod-col .prod-chip { display: flex; align-items: center; justify-content: space-between; gap: 4px; background: #e0e7ff; color: #3730a3; padding: 5px 6px; border-radius: 8px; font-size: clamp(9px, 3.2vw, 14px); font-weight: 600; cursor: default; border: 2px solid transparent; min-width: 0; overflow-wrap: anywhere; word-break: break-all; }
+.products-ref .prod-col .prod-chip.out-of-stock { background: #e5e7eb; color: #333; text-decoration: line-through; border-color: #d1d5db; }
+.products-ref .prod-col .prod-chip .chip-text { flex: 1; min-width: 0; line-height: 1.2; }
 .products-ref .prod-col .prod-chip [contenteditable="true"]:focus { outline: none; color: #1d4ed8; }
-.products-ref .prod-col .prod-chip .chip-stock { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 22px; padding: 0 6px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
-.products-ref .prod-col .prod-chip .chip-stock.stock-out { background: #dc2626; color: #fff; }
+.products-ref .prod-col .prod-chip .chip-stock { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 4px; border-radius: 10px; font-size: 10px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+.products-ref .prod-col .prod-chip .chip-stock.stock-out { background: #94a3b8; color: #fff; }
 .products-ref .prod-col .prod-chip .chip-stock.stock-has { background: #16a34a; color: #fff; }
-.products-ref .prod-col .prod-chip .chip-stock.stock-inf { background: #94a3b8; color: #fff; }
-.products-ref .prod-col .prod-chip .chip-del { display: none; width: 20px; height: 20px; align-items: center; justify-content: center; border-radius: 50%; background: #fecaca; color: #dc2626; font-size: 14px; cursor: pointer; margin-left: 2px; }
+.products-ref .prod-col .prod-chip .chip-stock.stock-inf { background: #3b82f6; color: #fff; }
+.products-ref .prod-col .prod-chip .chip-del { display: none; width: 18px; height: 18px; align-items: center; justify-content: center; border-radius: 50%; background: #fecaca; color: #dc2626; font-size: 12px; cursor: pointer; flex-shrink: 0; }
 .products-ref .prod-col .prod-chip:hover .chip-del { display: inline-flex; }
-.products-ref .prod-col .chip-add { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 18px; border: 1.5px dashed #cbd5e1; border-radius: 10px; color: #64748b; font-size: 12px; cursor: pointer; background: #fff; margin: 1px 2px; }
+.products-ref .prod-col .chip-add { display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 28px; border: 1.5px dashed #cbd5e1; border-radius: 8px; color: #64748b; font-size: 18px; cursor: pointer; background: #fff; margin-top: 4px; }
 .products-ref .prod-col .chip-add:hover { border-color: #3b82f6; color: #3b82f6; }
 .spec-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .btn-spec { font-size: 12px; padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer; background: #f1f5f9; color: #475569; }
@@ -153,6 +154,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
 .paste-preview-chip { background: #f0fdf4; border: 1px solid #86efac; border-radius: 16px; padding: 3px 8px; font-size: 12px; color: #166534; position: relative; display: inline-flex; align-items: center; gap: 4px; }
 .paste-chip-close { width: 14px; height: 14px; border-radius: 50%; background: #fecaca; color: #dc2626; font-size: 9px; line-height: 14px; text-align: center; cursor: pointer; flex-shrink: 0; }
 .paste-chip-close:hover { background: #fca5a5; }
+.paste-customer-info { background: #eff6ff; border: 1px solid #93c5fd; border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; }
+.paste-customer-title { font-size: 13px; font-weight: 700; color: #1e40af; margin-bottom: 6px; }
+.paste-customer-item { font-size: 12px; color: #1e293b; margin-bottom: 3px; }
+.paste-customer-label { color: #64748b; font-weight: 600; }
+.paste-preview-chip-list { display: flex; flex-wrap: wrap; gap: 6px; }
 .modal-footer { padding: 12px 16px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 8px; }
 
 /* Results area */
@@ -881,7 +887,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ========== 常量 ==========
 const DEFAULT_SPECS = {
   plain: { label: '直扶手', lengths: [3.0, 3.6, 4.0, 4.5], stocks: [null, null, null, null] },
-  left:  { label: '+左起步弯', lengths: [3.0, 3.6, 4.0, 4.5], stocks: [null, null, null, null] },
+  left:  { label: '+左起步弯', lengths: [3.0, 3.6, 4.0, 4.5, 5.0], stocks: [50, null, null, null, 0] },
   right: { label: '+右起步弯', lengths: [3.0, 3.6, 4.0, 4.5], stocks: [null, null, null, null] }
 };
 const SPEC_KEY = 'handrail_spec_config';
@@ -908,7 +914,7 @@ function loadSpecs() {
 
 function loadUnit() {
   const u = localStorage.getItem(UNIT_KEY);
-  return (u === 'm' || u === 'cm' || u === 'mm') ? u : 'm';
+  return (u === 'm' || u === 'cm' || u === 'mm') ? u : 'mm';
 }
 
 function saveSpecs() {
@@ -1058,10 +1064,10 @@ function renderSpecs() {
     container.innerHTML = conf.lengths.map((len, idx) => {
       const stock = conf.stocks ? conf.stocks[idx] : null;
       const stockClass = stock === 0 ? 'stock-out' : (stock === null ? 'stock-inf' : 'stock-has');
-      const stockLabel = stock === 0 ? '缺货' : (stock === null ? '∞' : '×' + stock);
+      const stockLabel = stock === 0 ? '缺货' : (stock === null ? '有货' : '×' + stock);
       return `<span class="prod-chip${stock === 0 ? ' out-of-stock' : ''}">
         <span class="chip-stock ${stockClass}" onclick="event.stopPropagation();editChipStockPrompt('${type}',${idx})" title="点击修改库存">${stockLabel}</span>
-        <span contenteditable="true"
+        <span class="chip-text" contenteditable="true"
           onblur="updateSpecLength('${type}', ${idx}, this)"
           onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">
           ${formatAsUnit(len, u)}${ul}</span>
@@ -1203,6 +1209,19 @@ function parsePastedText(text) {
   return rows;
 }
 
+// 从粘贴文本中提取客户姓名（不影响尺寸解析，仅用于自动填入）
+function _tryExtractName(text) {
+  const rawLines = text.split(/[\n\r]+/).map(s => s.trim()).filter(s => s);
+  for (let line of rawLines) {
+    if (/\d/.test(line)) continue;                                        // 含数字 → 是尺寸
+    if (/[路街巷号栋单元楼室区县省市区镇乡村小区大厦广场花园]/.test(line)) continue; // 像地址
+    if (/^1[3-9]\d{9}$/.test(line)) continue;                            // 是手机号
+    const name = line.replace(/^(姓名|客户|收货人|联系人)[：:]\s*/, '').trim();
+    if (/^[\u4e00-\u9fa5]{2,4}$/.test(name)) return name;                // 2-4个中文字
+  }
+  return null;
+}
+
 // 粘贴识别当前解析结果（供删除使用）
 let _pasteRows = [];
 
@@ -1263,6 +1282,13 @@ function applyPasteRows() {
     rowsEl.appendChild(createDemandRow(r.length, r.type));
   });
   _pasteRows = [];
+  // 自动识别客户姓名（仅在姓名字段为空时填入）
+  const rawText = document.getElementById('pasteArea').value;
+  const custName = _tryExtractName(rawText);
+  if (custName) {
+    const nameInput = document.getElementById('customerName');
+    if (!nameInput.value.trim()) nameInput.value = custName;
+  }
   _renumber();
   _updateCount();
   closePasteModal();
@@ -1466,25 +1492,76 @@ function binPackPlain(plainCm) {
 function processCurvedGroup(plainCm, availableIndices, curvedCmList, type) {
   const groups = [];
   let avail = [...availableIndices];
+  const maxCap = toCm(getMaxLength());
 
   for (const curvedCm of curvedCmList) {
-    const cap = toCm(getMaxLength()) - curvedCm;
-    const fill = knapsackFill(plainCm, avail, cap);
+    // 先判断弯管自身是否超出最大规格
+    if (curvedCm > maxCap) {
+      groups.push({
+        type: type,
+        curvedCm: curvedCm,
+        plainCms: [],
+        totalCm: curvedCm,
+        product: null,
+        wasteCm: null,
+        feasible: false
+      });
+      continue;
+    }
 
-    const totalCm = curvedCm + fill.totalCm;
-    const bestProd = findBestProduct(toM(totalCm), type);
+    // 遍历所有可用成品规格，选择能装下弯管+直段且浪费最小的组合
+    const conf = SPEC_CONFIG[type] || DEFAULT_SPECS[type];
+    const prodLengths = [...conf.lengths].sort((a, b) => a - b);
+    let bestFill = { selectedIndices: [], totalCm: 0, remainingIndices: avail };
+    let bestProd = null;
+    let bestTotal = -1;
+
+    for (const prodLen of prodLengths) {
+      const prodCm = toCm(prodLen);
+      if (prodCm < curvedCm) continue;                 // 成品连弯管都装不下
+      if (prodCm > maxCap) continue;                   // 超过最大规格
+      if (conf.stocks) {
+        const idx = conf.lengths.indexOf(prodLen);
+        if (conf.stocks[idx] === 0) continue;          // 缺货
+      }
+
+      const cap = prodCm - curvedCm;
+      const fill = knapsackFill(plainCm, avail, cap);
+      const totalCm = curvedCm + fill.totalCm;
+
+      // 优先选能装更多直段的（浪费更少）
+      if (totalCm > bestTotal) {
+        bestTotal = totalCm;
+        bestFill = fill;
+        bestProd = prodLen;
+      }
+    }
+
+    // 如果连最小规格都装不下弯管，则该弯管无法匹配
+    if (bestProd === null) {
+      groups.push({
+        type: type,
+        curvedCm: curvedCm,
+        plainCms: [],
+        totalCm: curvedCm,
+        product: null,
+        wasteCm: null,
+        feasible: false
+      });
+      continue;
+    }
 
     groups.push({
       type: type,
       curvedCm: curvedCm,
-      plainCms: fill.selectedIndices.map(i => plainCm[i]),
-      totalCm: totalCm,
+      plainCms: bestFill.selectedIndices.map(i => plainCm[i]),
+      totalCm: bestTotal,
       product: bestProd,
-      wasteCm: bestProd !== null ? (toCm(bestProd) - totalCm) : null,
-      feasible: bestProd !== null
+      wasteCm: toCm(bestProd) - bestTotal,
+      feasible: true
     });
 
-    avail = fill.remainingIndices;
+    avail = bestFill.remainingIndices;
   }
 
   return { groups, remainingIndices: avail };
