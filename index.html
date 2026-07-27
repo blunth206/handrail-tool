@@ -402,7 +402,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
             <div class="spec-section-title"><span>🏷️</span> 我有的规格</div>
             <div class="unit-selector">
               <label>单位：</label>
-              <select id="displayUnit" onchange="changeDisplayUnit(this.value)">
+              <select id="displayUnit">
                 <option value="m">米 (m)</option>
                 <option value="cm">厘米 (cm)</option>
                 <option value="mm">毫米 (mm)</option>
@@ -935,6 +935,7 @@ function fromDisplayUnit(val) {
 }
 
 function changeDisplayUnit(newUnit) {
+  if (!newUnit || newUnit === UNIT) return;
   const oldUnit = UNIT;
   const rows = document.querySelectorAll('#demandRows .demand-row');
   // 单次转换：旧单位读取→米→新单位显示
@@ -943,9 +944,9 @@ function changeDisplayUnit(newUnit) {
     if (!input || input.disabled || !input.value.trim()) return;
     UNIT = oldUnit;
     const mVal = fromDisplayUnit(parseFloat(input.value));
-    UNIT = newUnit;
     if (!isNaN(mVal)) input.value = formatAsUnit(mVal, newUnit);
   });
+  UNIT = newUnit; // 真正切换全局单位
   localStorage.setItem(UNIT_KEY, UNIT);
   document.getElementById('displayUnit').value = UNIT;
   // 更新输入框属性
@@ -2036,6 +2037,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const today = new Date();
   document.getElementById('calcDate').textContent = '计算日期：' + today.toLocaleDateString('zh-CN');
   document.getElementById('displayUnit').value = UNIT;
+  // 单位下拉兼容绑定（华为等机型 change 事件不稳定，同时监听 input/change/blur）
+  const unitSelect = document.getElementById('displayUnit');
+  function _onUnitChange(e) {
+    const v = e && e.target ? e.target.value : unitSelect.value;
+    if (v && v !== UNIT) changeDisplayUnit(v);
+  }
+  unitSelect.addEventListener('change', _onUnitChange);
+  unitSelect.addEventListener('input', _onUnitChange);
+  unitSelect.addEventListener('blur', _onUnitChange);
   renderSpecs();
   updateTipBox();
   addRow('', 'plain');
