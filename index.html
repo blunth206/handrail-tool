@@ -11,7 +11,10 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1e3a5f">
 <link rel="manifest" href="/handrail-tool/manifest.json">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231e3a5f'/><text x='50' y='68' text-anchor='middle' font-size='50'>🪜</text></svg>">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon.png">
+<link rel="apple-touch-icon" href="icons/icon.png">
+<meta name="msapplication-TileImage" content="icons/icon.png">
+<meta name="msapplication-TileColor" content="#1e3a5f">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif; background: #f0f4f8; min-height: 100vh; color: #1a202c; }
@@ -312,6 +315,64 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
 .ios-guide-box { background: #fff; border-radius: 12px; padding: 18px 22px; box-shadow: 0 8px 30px rgba(0,0,0,0.25); text-align: center; font-size: 14px; color: #1e293b; line-height: 2; margin: 0 20px; }
 .ios-guide-arrow { font-size: 32px; animation: bounce-up 1.5s ease infinite; }
 @keyframes bounce-up { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+/* 会员中心 */
+.member-btn { background: linear-gradient(135deg,#f59e0b,#d97706); border: 2px solid #fcd34d; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 2px 8px rgba(245,158,11,0.35); }
+.member-btn:hover { transform: scale(1.1); box-shadow: 0 4px 16px rgba(245,158,11,0.5); }
+.member-badge { position: fixed; top: 8px; left: 50%; transform: translateX(-50%); z-index: 9998; background: #10b981; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; box-shadow: 0 2px 6px rgba(16,185,129,0.3); pointer-events: none; }
+.member-modal-box { background: #fff; border-radius: 12px; width: 100%; max-width: 460px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+.member-modal-box .modal-body { flex: 1; overflow-y: auto; min-height: 0; }
+.member-status-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; border-radius: 12px; margin-bottom: 16px; }
+.member-status-bar.free { background: linear-gradient(135deg,#f8fafc,#f1f5f9); border: 1.5px solid #e2e8f0; }
+.member-status-bar.active { background: linear-gradient(135deg,#ecfdf5,#d1fae5); border: 1.5px solid #6ee7b7; }
+.member-status-bar.expired { background: linear-gradient(135deg,#fef2f2,#fee2e2); border: 1.5px solid #fca5a5; }
+.member-status-left { display: flex; align-items: center; gap: 8px; }
+.member-status-icon { font-size: 28px; }
+.member-status-info { line-height: 1.4; }
+.member-status-label { font-size: 11px; color: #64748b; }
+.member-status-value { font-size: 15px; font-weight: 700; color: #1e293b; }
+.member-status-expiry { font-size: 11px; color: #64748b; }
+.member-plans { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.member-plan-card { border: 2px solid #e2e8f0; border-radius: 12px; padding: 16px 12px; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
+.member-plan-card:hover { border-color: #f59e0b; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,158,11,0.15); }
+.member-plan-card.selected { border-color: #f59e0b; background: #fffbeb; }
+.member-plan-card.featured::before { content: '推荐'; position: absolute; top: 8px; right: -22px; background: #dc2626; color: #fff; font-size: 9px; font-weight: 700; padding: 2px 22px; transform: rotate(45deg); }
+.member-plan-icon { font-size: 32px; margin-bottom: 6px; }
+.member-plan-name { font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+.member-plan-price { font-size: 26px; font-weight: 800; color: #f59e0b; margin-bottom: 2px; }
+.member-plan-price-unit { font-size: 13px; font-weight: 500; color: #64748b; }
+.member-plan-desc { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+.member-btn-row { display: flex; gap: 10px; }
+.member-btn-pay { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; background: linear-gradient(135deg,#f59e0b,#d97706); color: #fff; box-shadow: 0 4px 14px rgba(245,158,11,0.35); transition: all 0.2s; }
+.member-btn-pay:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245,158,11,0.45); }
+.member-btn-pay:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.member-activate-section { border-top: 1px solid #e2e8f0; padding-top: 14px; margin-top: 14px; }
+.member-activate-title { font-size: 13px; font-weight: 700; color: #475569; margin-bottom: 8px; }
+.member-activate-row { display: flex; gap: 8px; }
+.member-activate-input { flex: 1; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; font-size: 14px; font-family: inherit; letter-spacing: 2px; }
+.member-activate-input:focus { outline: none; border-color: #3b82f6; }
+.member-activate-btn { padding: 10px 18px; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; background: #3b82f6; color: #fff; white-space: nowrap; }
+.member-activate-btn:hover { background: #2563eb; }
+.member-activate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.member-pay-qr { text-align: center; padding: 16px; }
+.member-pay-qr img { width: 180px; height: 180px; border: 1px solid #e2e8f0; border-radius: 12px; object-fit: contain; background: #fff; }
+.member-pay-qr-placeholder { width: 180px; height: 180px; margin: 0 auto; border: 2px dashed #e2e8f0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 12px; gap: 6px; }
+.member-pay-info { font-size: 13px; color: #475569; margin-top: 10px; font-weight: 600; }
+.member-pay-amount { font-size: 28px; font-weight: 800; color: #dc2626; }
+/* 管理面板中的激活码管理 */
+.member-admin-section { border-top: 1px solid #e2e8f0; margin-top: 10px; padding-top: 10px; }
+.member-admin-title { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 6px; }
+.member-admin-row { display: flex; gap: 6px; margin-bottom: 8px; }
+.member-admin-row select { flex: 1; border: 1.5px solid #e2e8f0; border-radius: 6px; padding: 6px 8px; font-size: 11px; font-family: inherit; cursor: pointer; }
+.member-admin-row button { padding: 6px 12px; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; background: #f59e0b; color: #fff; white-space: nowrap; }
+.member-admin-row button:hover { background: #d97706; }
+.member-code-list { max-height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.member-code-item { display: flex; align-items: center; justify-content: space-between; padding: 4px 8px; background: #f8fafc; border-radius: 6px; font-size: 10px; gap: 6px; }
+.member-code-item code { font-size: 11px; font-family: 'Courier New', monospace; background: #e2e8f0; padding: 1px 6px; border-radius: 4px; cursor: pointer; user-select: all; }
+.member-code-status { font-size: 10px; padding: 1px 6px; border-radius: 8px; font-weight: 600; }
+.member-code-status.used { background: #dcfce7; color: #166534; }
+.member-code-status.unused { background: #fef3c7; color: #92400e; }
+.member-code-del { font-size: 14px; cursor: pointer; color: #dc2626; background: none; border: none; line-height: 1; }
 </style>
 </head>
 <body>
@@ -360,6 +421,29 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
     <button onclick="addSubPassword()">添加</button>
   </div>
   <div class="admin-hint">💡 子密码首次使用时自动绑定当前设备，绑定后其他设备无法使用同一密码登录。用户更换设备后，管理员可在绑定状态旁点击 🔓 解绑。</div>
+  <!-- 会员激活码管理 -->
+  <div class="member-admin-section">
+    <div class="member-admin-title">💳 会员激活码管理</div>
+    <div class="member-admin-row">
+      <select id="memberCodeType">
+        <option value="yearly">包年 (10元)</option>
+        <option value="lifetime">买断 (100元)</option>
+      </select>
+      <button onclick="generateMemberCode()">生成激活码</button>
+    </div>
+    <div class="member-code-list" id="memberCodeList">
+      <div style="font-size:10px;color:#94a3b8;">暂无激活码，点击上方按钮生成</div>
+    </div>
+  </div>
+  <!-- 收款二维码配置 -->
+  <div class="member-admin-section">
+    <div class="member-admin-title">📱 收款二维码</div>
+    <div class="member-admin-row">
+      <input type="text" id="memberPayQRUrl" placeholder="输入收款二维码图片URL" style="flex:1;border:1.5px solid #e2e8f0;border-radius:6px;padding:6px 8px;font-size:11px;font-family:inherit;">
+      <button onclick="saveMemberQR()">保存</button>
+    </div>
+    <div style="font-size:10px;color:#94a3b8;">上传图片到图床后填入直链即可</div>
+  </div>
   <div class="admin-btns">
     <button class="btn-save" onclick="saveAdminSettings()">保存</button>
     <button class="btn-close" onclick="toggleAdminPanel()">关闭</button>
@@ -388,6 +472,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
 
 <div class="top-toolbar">
   <button class="logout-btn" id="logoutBtn" title="退出登录">↪</button>
+  <button class="member-btn" id="memberBtn" title="会员中心">💰</button>
   <button class="admin-toggle" id="adminToggle" title="管理设置">⚙</button>
 </div>
 
@@ -532,6 +617,72 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
     </div>
   </div>
 </div>
+
+<!-- Membership center modal -->
+<div class="modal-overlay" id="memberOverlay">
+  <div class="member-modal-box" id="memberModal">
+  <div class="modal-header">
+    <div class="modal-title">💰 会员中心</div>
+    <button class="modal-close" onclick="closeMemberModal()">×</button>
+  </div>
+  <div class="modal-body" style="padding-top:12px;">
+  <div class="member-status-bar free" id="memberStatusBar">
+    <div class="member-status-left">
+      <div class="member-status-icon" id="memberStatusIcon">🆓</div>
+      <div class="member-status-info">
+        <div class="member-status-label" id="memberStatusLabel">当前状态</div>
+        <div class="member-status-value" id="memberStatusValue">免费用户</div>
+        <div class="member-status-expiry" id="memberStatusExpiry"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="member-plans">
+    <div class="member-plan-card" id="planYearly" onclick="selectMemberPlan('yearly')">
+      <div class="member-plan-icon">📅</div>
+      <div class="member-plan-name">包年订阅</div>
+      <div class="member-plan-price">10<span class="member-plan-price-unit">元/年</span></div>
+      <div class="member-plan-desc">一年内无限使用全部功能</div>
+    </div>
+    <div class="member-plan-card featured" id="planLifetime" onclick="selectMemberPlan('lifetime')">
+      <div class="member-plan-icon">👑</div>
+      <div class="member-plan-name">永久买断</div>
+      <div class="member-plan-price">100<span class="member-plan-price-unit">元/永久</span></div>
+      <div class="member-plan-desc">一次购买，终身使用</div>
+    </div>
+  </div>
+
+  <div class="member-btn-row">
+    <button class="member-btn-pay" id="memberPayBtn" disabled onclick="startMemberPayment()">💳 立即购买</button>
+  </div>
+
+  <!-- Payment step -->
+  <div id="memberPayStep" style="display:none;">
+    <div class="member-pay-qr" id="memberPayQR">
+      <div class="member-pay-qr-placeholder" id="memberPayPlaceholder">
+        <div style="font-size:40px;">📱</div>
+        <div>请在此处放置</div>
+        <div>收款二维码图片</div>
+        <div style="font-size:10px;color:#94a3b8;">管理员可在"管理设置"中配置</div>
+      </div>
+      <img id="memberPayQRImg" src="" alt="收款二维码" style="display:none;" onerror="this.style.display='none';document.getElementById('memberPayPlaceholder').style.display='flex';">
+    </div>
+    <div class="member-pay-info">
+      请支付 <span class="member-pay-amount" id="memberPayAmount">10.00</span> 元后，<br>输入激活码完成激活
+    </div>
+    <div class="member-activate-section" style="border-top:none;margin-top:8px;padding-top:8px;">
+      <div class="member-activate-title">🔑 输入激活码</div>
+      <div class="member-activate-row">
+        <input class="member-activate-input" id="memberActivateCode" placeholder="请输入8位激活码" maxlength="16" autocomplete="off">
+        <button class="member-activate-btn" id="memberActivateBtn" onclick="activateMember()">激活</button>
+      </div>
+      <div id="memberActivateMsg" style="font-size:11px;margin-top:4px;text-align:center;"></div>
+    </div>
+    <button class="btn btn-secondary" style="margin-top:10px;width:100%;" onclick="closeMemberPayment()">← 返回选择方案</button>
+  </div>
+  </div><!-- /modal-body -->
+</div><!-- /member-modal-box -->
+</div><!-- /modal-overlay -->
 
 <script>
 'use strict';
@@ -2348,7 +2499,266 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   const overlay = document.getElementById('loginOverlay');
   if (overlay) loginObserver.observe(overlay, { attributes: true, attributeFilter: ['class'] });
+
+  // 会员中心
+  document.getElementById('memberBtn').addEventListener('click', toggleMemberModal);
+  loadMemberData();
 });
+
+// ========== 会员系统 ==========
+const MEMBER_KEY = 'handrail_member_data';
+const MEMBER_CODES_KEY = 'handrail_member_codes';
+const MEMBER_QR_KEY = 'handrail_member_qr';
+
+let memberData = { type: 'free', expiry: null, active: false };
+let memberCodes = [];
+let payQRUrl = '';
+let selectedPlan = null;
+
+function loadMemberData() {
+  try {
+    const saved = localStorage.getItem(MEMBER_KEY);
+    if (saved) memberData = JSON.parse(saved);
+  } catch(e) {}
+  // 检查是否过期
+  if (memberData.active && memberData.expiry && new Date(memberData.expiry) < new Date()) {
+    memberData.active = false;
+    memberData.type = 'expired';
+    saveMemberData();
+  }
+  try {
+    const codes = localStorage.getItem(MEMBER_CODES_KEY);
+    if (codes) memberCodes = JSON.parse(codes);
+  } catch(e) { memberCodes = []; }
+  try {
+    payQRUrl = localStorage.getItem(MEMBER_QR_KEY) || '';
+  } catch(e) { payQRUrl = ''; }
+  updateMemberBadge();
+}
+
+function saveMemberData() {
+  localStorage.setItem(MEMBER_KEY, JSON.stringify(memberData));
+}
+
+function updateMemberBadge() {
+  let badge = document.getElementById('memberBadge');
+  if (memberData.active) {
+    if (!badge) {
+      badge = document.createElement('div');
+      badge.className = 'member-badge';
+      badge.id = 'memberBadge';
+      document.body.appendChild(badge);
+    }
+    badge.textContent = memberData.type === 'lifetime' ? '👑 永久会员' : '✅ 会员';
+  } else {
+    if (badge) badge.remove();
+  }
+}
+
+function toggleMemberModal() {
+  const overlay = document.getElementById('memberOverlay');
+  if (overlay.classList.contains('show')) {
+    closeMemberModal();
+    return;
+  }
+  selectedPlan = null;
+  updateMemberModalStatus();
+  document.getElementById('planYearly').classList.remove('selected');
+  document.getElementById('planLifetime').classList.remove('selected');
+  document.getElementById('memberPayBtn').disabled = true;
+  document.getElementById('memberPayStep').style.display = 'none';
+  overlay.classList.add('show');
+}
+
+function closeMemberModal() {
+  document.getElementById('memberOverlay').classList.remove('show');
+  document.getElementById('memberPayStep').style.display = 'none';
+}
+
+function updateMemberModalStatus() {
+  const bar = document.getElementById('memberStatusBar');
+  const icon = document.getElementById('memberStatusIcon');
+  const label = document.getElementById('memberStatusLabel');
+  const value = document.getElementById('memberStatusValue');
+  const expiry = document.getElementById('memberStatusExpiry');
+  bar.className = 'member-status-bar';
+  if (memberData.active) {
+    bar.classList.add('active');
+    icon.textContent = memberData.type === 'lifetime' ? '👑' : '✅';
+    value.textContent = memberData.type === 'lifetime' ? '永久会员' : '包年会员';
+    expiry.textContent = memberData.type === 'yearly' ? '有效期至：' + formatDate(memberData.expiry) : '永久有效';
+    label.textContent = '当前状态';
+  } else if (memberData.type === 'expired') {
+    bar.classList.add('expired');
+    icon.textContent = '⏰';
+    label.textContent = '已过期';
+    value.textContent = '会员已到期';
+    expiry.textContent = '';
+  } else {
+    bar.classList.add('free');
+    icon.textContent = '🆓';
+    label.textContent = '当前状态';
+    value.textContent = '免费用户';
+    expiry.textContent = '购买会员解锁全部功能';
+  }
+}
+
+function formatDate(d) {
+  if (!d) return '';
+  const date = new Date(d);
+  return date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0');
+}
+
+function selectMemberPlan(type) {
+  selectedPlan = type;
+  document.getElementById('planYearly').classList.toggle('selected', type === 'yearly');
+  document.getElementById('planLifetime').classList.toggle('selected', type === 'lifetime');
+  document.getElementById('memberPayBtn').disabled = false;
+}
+
+function startMemberPayment() {
+  if (!selectedPlan) return;
+  const amount = selectedPlan === 'yearly' ? 10 : 100;
+  document.getElementById('memberPayAmount').textContent = amount.toFixed(2);
+  
+  // 加载收款二维码
+  const img = document.getElementById('memberPayQRImg');
+  const placeholder = document.getElementById('memberPayPlaceholder');
+  if (payQRUrl) {
+    img.src = payQRUrl;
+    img.style.display = 'block';
+    placeholder.style.display = 'none';
+  } else {
+    img.style.display = 'none';
+    placeholder.style.display = 'flex';
+  }
+
+  document.getElementById('memberPayStep').style.display = 'block';
+  document.getElementById('memberActivateCode').value = '';
+  document.getElementById('memberActivateMsg').textContent = '';
+}
+
+function closeMemberPayment() {
+  document.getElementById('memberPayStep').style.display = 'none';
+}
+
+function activateMember() {
+  const code = document.getElementById('memberActivateCode').value.trim();
+  const msg = document.getElementById('memberActivateMsg');
+  if (!code) { msg.textContent = '请输入激活码'; msg.style.color = '#dc2626'; return; }
+
+  // 查找激活码
+  const found = memberCodes.find(c => c.code === code && !c.used);
+  if (!found) {
+    msg.textContent = '❌ 激活码无效或已被使用，请联系管理员';
+    msg.style.color = '#dc2626';
+    return;
+  }
+
+  // 标记已使用
+  found.used = true;
+  found.usedAt = new Date().toISOString();
+  localStorage.setItem(MEMBER_CODES_KEY, JSON.stringify(memberCodes));
+
+  // 激活会员
+  memberData.type = found.plan;
+  memberData.active = true;
+  if (found.plan === 'yearly') {
+    const expiry = new Date();
+    expiry.setFullYear(expiry.getFullYear() + 1);
+    memberData.expiry = expiry.toISOString();
+  } else {
+    memberData.expiry = null; // 永久
+  }
+  saveMemberData();
+  updateMemberBadge();
+  updateMemberModalStatus();
+
+  msg.textContent = '✅ 激活成功！' + (found.plan === 'lifetime' ? '永久会员' : '有效期至 ' + formatDate(memberData.expiry));
+  msg.style.color = '#10b981';
+
+  // 2秒后关闭
+  setTimeout(() => {
+    closeMemberModal();
+    updateMemberBadge();
+  }, 2000);
+}
+
+function generateMemberCode() {
+  const type = document.getElementById('memberCodeType').value;
+  const code = 'HM' + Math.random().toString(36).substring(2, 8).toUpperCase();
+  memberCodes.push({
+    code,
+    plan: type,
+    used: false,
+    createdAt: new Date().toISOString()
+  });
+  localStorage.setItem(MEMBER_CODES_KEY, JSON.stringify(memberCodes));
+  renderMemberCodeList();
+  showToast('✅ 激活码已生成：' + code);
+}
+
+function renderMemberCodeList() {
+  const container = document.getElementById('memberCodeList');
+  if (!container) return;
+  if (memberCodes.length === 0) {
+    container.innerHTML = '<div style="font-size:10px;color:#94a3b8;">暂无激活码，点击上方按钮生成</div>';
+    return;
+  }
+  container.innerHTML = memberCodes.map((c, i) => `
+    <div class="member-code-item">
+      <code onclick="copyCode('${c.code}')" title="点击复制">${c.code}</code>
+      <span class="member-code-status ${c.used ? 'used' : 'unused'}">${c.used ? '已用' : '未用'}</span>
+      ${!c.used ? `<button class="member-code-del" onclick="deleteMemberCode(${i})">×</button>` : ''}
+    </div>
+  `).reverse().join('');
+}
+
+function copyCode(code) {
+  navigator.clipboard.writeText(code).then(() => {
+    showToast('📋 已复制：' + code);
+  });
+}
+
+function deleteMemberCode(index) {
+  memberCodes.splice(index, 1);
+  localStorage.setItem(MEMBER_CODES_KEY, JSON.stringify(memberCodes));
+  renderMemberCodeList();
+}
+
+function saveMemberQR() {
+  const url = document.getElementById('memberPayQRUrl').value.trim();
+  payQRUrl = url;
+  localStorage.setItem(MEMBER_QR_KEY, payQRUrl);
+  showToast('✅ 收款二维码已保存');
+  // 立即更新支付页面
+  const img = document.getElementById('memberPayQRImg');
+  const placeholder = document.getElementById('memberPayPlaceholder');
+  if (url) {
+    img.src = url;
+    img.style.display = 'block';
+    placeholder.style.display = 'none';
+  } else {
+    img.style.display = 'none';
+    placeholder.style.display = 'flex';
+  }
+}
+
+// 点击弹窗遮罩关闭会员中心
+document.getElementById('memberOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'memberOverlay') closeMemberModal();
+});
+
+// 加载激活码列表（管理面板打开时调用）
+const origToggleAdmin = window.toggleAdminPanel;
+window.toggleAdminPanel = function() {
+  origToggleAdmin();
+  const panel = document.getElementById('adminPanel');
+  if (panel.classList.contains('show')) {
+    renderMemberCodeList();
+    document.getElementById('memberPayQRUrl').value = payQRUrl || '';
+  }
+};
 </script>
 
 <div id="toast" class="toast"></div>
