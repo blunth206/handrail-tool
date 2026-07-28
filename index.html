@@ -783,17 +783,25 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
     <div class="member-pay-tips" style="text-align:center;font-size:12px;color:#64748b;margin-bottom:8px;">
       请使用 <b>支付宝</b> 或 <b>微信</b> 扫一扫付款
     </div>
-    <div class="member-pay-tips" style="text-align:center;font-size:11px;color:#94a3b8;margin-bottom:10px;">
-      付款完成后，输入激活码完成激活
+    <!-- 自动弹出激活码区域 -->
+    <div id="memberAutoCode" style="display:none;text-align:center;margin:12px 0;padding:12px;background:#f0fdf4;border:2px solid #10b981;border-radius:10px;">
+      <div style="font-size:12px;color:#166534;margin-bottom:6px;font-weight:600;">🎁 付款后请点击下方按钮立即激活</div>
+      <div style="font-size:22px;font-weight:800;font-family:'Courier New',monospace;color:#10b981;letter-spacing:2px;padding:8px 16px;background:#fff;border-radius:8px;display:inline-block;border:2px dashed #10b981;margin-bottom:8px;" id="memberAutoCodeText"></div>
+      <div style="margin-top:6px;">
+        <button class="member-activate-btn" id="memberAutoActivateBtn" style="font-size:14px;padding:10px 28px;background:#10b981;" onclick="activateAutoCode()">✅ 一键激活</button>
+      </div>
     </div>
-    <div class="member-activate-section" style="border-top:none;margin-top:0;padding-top:8px;">
+    <div class="member-pay-tips" style="text-align:center;font-size:11px;color:#94a3b8;margin-bottom:10px;" id="memberManualTip">
+      或手动输入管理员提供的激活码
+    </div>
+    <div class="member-activate-section" style="border-top:none;margin-top:0;padding-top:8px;" id="memberManualInput">
       <div class="member-activate-title">🔑 输入激活码</div>
       <div class="member-activate-row">
         <input class="member-activate-input" id="memberActivateCode" placeholder="请输入8位激活码" maxlength="16" autocomplete="off">
         <button class="member-activate-btn" id="memberActivateBtn" onclick="activateMember()">激活</button>
       </div>
-      <div id="memberActivateMsg" style="font-size:11px;margin-top:4px;text-align:center;"></div>
     </div>
+    <div id="memberActivateMsg" style="font-size:11px;margin-top:4px;text-align:center;"></div>
     <button class="btn btn-secondary" style="margin-top:10px;width:100%;" onclick="closeMemberPayment()">← 返回选择方案</button>
   </div>
   </div><!-- /modal-body -->
@@ -3293,6 +3301,7 @@ function toggleMemberModal() {
 function closeMemberModal() {
   document.getElementById('memberOverlay').classList.remove('show');
   document.getElementById('memberPayStep').style.display = 'none';
+  _autoCode = null;
 }
 
 function updateMemberModalStatus() {
@@ -3337,6 +3346,8 @@ function selectMemberPlan(type) {
   startMemberPayment();
 }
 
+let _autoCode = null; // 当前自动分配的激活码
+
 function startMemberPayment() {
   if (!selectedPlan) return;
   const amount = selectedPlan === 'yearly' ? 5 : 30;
@@ -3354,13 +3365,41 @@ function startMemberPayment() {
     placeholder.style.display = 'flex';
   }
 
+  // 自动分配一个未使用的激活码给用户
+  _autoCode = null;
+  const unused = memberCodes.find(c => !c.used && c.plan === selectedPlan);
+  const autoCodeEl = document.getElementById('memberAutoCode');
+  const autoCodeText = document.getElementById('memberAutoCodeText');
+  const manualTip = document.getElementById('memberManualTip');
+  const manualInput = document.getElementById('memberManualInput');
+  
+  if (unused) {
+    _autoCode = unused;
+    autoCodeText.textContent = unused.code;
+    autoCodeEl.style.display = 'block';
+    manualTip.style.display = 'block';
+    manualInput.style.display = 'block';
+  } else {
+    autoCodeEl.style.display = 'none';
+    manualTip.style.display = 'none';
+    manualInput.style.display = 'block';
+  }
+
   document.getElementById('memberPayStep').style.display = 'block';
   document.getElementById('memberActivateCode').value = '';
   document.getElementById('memberActivateMsg').textContent = '';
 }
 
+// 一键激活自动分配的激活码
+function activateAutoCode() {
+  if (!_autoCode) return;
+  document.getElementById('memberActivateCode').value = _autoCode.code;
+  activateMember();
+}
+
 function closeMemberPayment() {
   document.getElementById('memberPayStep').style.display = 'none';
+  _autoCode = null;
 }
 
 function activateMember() {
