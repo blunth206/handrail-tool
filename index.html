@@ -28,6 +28,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
 .header-actions { display: flex; gap: 6px; flex-shrink: 0; padding-top: 2px; align-items: flex-start; position: relative; }
 .logout-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
 .logout-btn:hover { background: rgba(255,255,255,0.3); }
+/* 试用状态标签 */
+.trial-status { display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.35); color: #fff; height: 32px; border-radius: 8px; font-size: 12px; padding: 0 10px; white-space: nowrap; cursor: pointer; transition: background 0.2s; }
+.trial-status:hover { background: rgba(255,255,255,0.3); }
+.trial-status .ts-icon { font-size: 14px; }
+.trial-status .ts-day { font-weight: 700; }
 /* 会员按钮：位于头部操作区 */
 .vip-header-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; height: 32px; border-radius: 8px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0 8px; gap: 4px; transition: background 0.2s; white-space: nowrap; }
 .vip-header-btn:hover { background: rgba(255,255,255,0.3); }
@@ -559,6 +564,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
       <p>输入客户需求尺寸，自动计算最优组合方案，最小化浪费</p>
     </div>
     <div class="header-actions">
+      <div class="trial-status" id="trialStatus" style="display:none;" onclick="toggleMemberModal()">
+        <span class="ts-icon">📱</span>试用<span class="ts-day" id="trialDayCount"></span>
+      </div>
       <button class="vip-header-btn" id="vipBtn" title="会员中心" onclick="toggleMemberModal()"><span class="vip-icon">👑</span>VIP</button>
       <button class="user-menu-btn" id="userMenuBtn" title="用户菜单" onclick="toggleUserMenu()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="4" fill="white"/><path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8" fill="white"/></svg></button>
       <div class="user-dropdown" id="userDropdown">
@@ -758,10 +766,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
     </div>
   </div>
 
-  <div class="member-btn-row">
-    <button class="member-btn-pay" id="memberPayBtn" disabled onclick="startMemberPayment()">💳 立即付款</button>
-  </div>
-
   <!-- Payment step -->
   <div id="memberPayStep" style="display:none;">
     <div class="member-pay-qr" id="memberPayQR">
@@ -774,7 +778,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
       <img id="memberPayQRImg" src="" alt="收款二维码" style="display:none;" onerror="this.style.display='none';document.getElementById('memberPayPlaceholder').style.display='flex';">
     </div>
     <div class="member-pay-info">
-      请支付 <span class="member-pay-amount" id="memberPayAmount">10.00</span> 元
+      请支付 <span class="member-pay-amount" id="memberPayAmount">5.00</span> 元
     </div>
     <div class="member-pay-tips" style="text-align:center;font-size:12px;color:#64748b;margin-bottom:8px;">
       请使用 <b>支付宝</b> 或 <b>微信</b> 扫一扫付款
@@ -1141,18 +1145,22 @@ async function phoneRegister() {
 
 function doPhoneLoginSuccess(phone, reg) {
   const daysLeft = reg.trialExpiry ? Math.ceil((reg.trialExpiry - Date.now()) / (24 * 60 * 60 * 1000)) : 0;
+  const trialDay = Math.ceil((Date.now() - reg.registeredAt) / (24 * 60 * 60 * 1000));
   sessionStorage.setItem(AUTH_KEY, '1');
   sessionStorage.setItem(AUTH_KEY + '_phone', phone);
   sessionStorage.setItem(AUTH_KEY + '_admin', '0');
+  sessionStorage.setItem(AUTH_KEY + '_trial_day', trialDay.toString());
+  sessionStorage.setItem(AUTH_KEY + '_trial_left', daysLeft.toString());
   
   document.getElementById('loginOverlay').classList.add('hidden');
   document.getElementById('mainContent').classList.remove('blurred');
   document.getElementById('adminToggle').style.display = 'none';
+  updateTrialStatusDisplay();
   
   // 试用期提示
   if (daysLeft > 0 && daysLeft <= TRIAL_DAYS) {
     setTimeout(() => {
-      showToast(`📱 试用剩余 ${daysLeft} 天`, 4000);
+      showToast(`📱 试用第 ${trialDay} 天，剩余 ${daysLeft} 天`, 4000);
     }, 500);
   }
 }
@@ -1168,6 +1176,29 @@ function checkPhoneTrialStatus() {
   const user = getCurrentPhoneUser();
   if (!user || !user.trialExpiry) return true; // 不是手机号登录，放行
   return Date.now() <= user.trialExpiry;
+}
+
+function updateTrialStatusDisplay() {
+  const trialEl = document.getElementById('trialStatus');
+  const dayEl = document.getElementById('trialDayCount');
+  if (!trialEl || !dayEl) return;
+  const phone = sessionStorage.getItem(AUTH_KEY + '_phone');
+  const user = getCurrentPhoneUser();
+  if (!phone || !user || !user.trialExpiry) {
+    trialEl.style.display = 'none';
+    return;
+  }
+  const daysLeft = Math.ceil((user.trialExpiry - Date.now()) / (24 * 60 * 60 * 1000));
+  const trialDay = Math.ceil((Date.now() - user.registeredAt) / (24 * 60 * 60 * 1000));
+  if (daysLeft <= 0) {
+    trialEl.style.display = 'flex';
+    trialEl.style.background = 'rgba(220,38,38,0.35)';
+    dayEl.textContent = '已到期';
+  } else {
+    trialEl.style.display = 'flex';
+    trialEl.style.background = 'rgba(255,255,255,0.2)';
+    dayEl.textContent = `第${trialDay}/${TRIAL_DAYS}天`;
+  }
 }
 
 function formatPhoneTime(ts) {
@@ -1298,6 +1329,8 @@ function checkAuth() {
     } else {
       document.getElementById('vipBtn').style.display = 'none';
     }
+    // 更新试用状态
+    updateTrialStatusDisplay();
     // 从云端拉取最新数据
     setTimeout(() => sbPullFromCloud(), 500);
   } else {
@@ -3236,7 +3269,6 @@ function toggleMemberModal() {
   updateMemberModalStatus();
   document.getElementById('planYearly').classList.remove('selected');
   document.getElementById('planLifetime').classList.remove('selected');
-  document.getElementById('memberPayBtn').disabled = true;
   document.getElementById('memberPayStep').style.display = 'none';
   overlay.classList.add('show');
 }
@@ -3284,12 +3316,13 @@ function selectMemberPlan(type) {
   selectedPlan = type;
   document.getElementById('planYearly').classList.toggle('selected', type === 'yearly');
   document.getElementById('planLifetime').classList.toggle('selected', type === 'lifetime');
-  document.getElementById('memberPayBtn').disabled = false;
+  // 点击卡片直接显示二维码
+  startMemberPayment();
 }
 
 function startMemberPayment() {
   if (!selectedPlan) return;
-  const amount = selectedPlan === 'yearly' ? 10 : 100;
+  const amount = selectedPlan === 'yearly' ? 5 : 30;
   document.getElementById('memberPayAmount').textContent = amount.toFixed(2);
   
   // 加载收款二维码
