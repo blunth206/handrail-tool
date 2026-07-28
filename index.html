@@ -846,8 +846,8 @@ function sbInit() {
 async function sbPullFromCloud() {
   if (!SB) return;
   try {
-    // 1. 子密码列表 + 手机注册数据
-    const { data: settings } = await SB.from('handrail_settings').select('extra_entries,pay_qr_url,phone_regs').eq('id', 1).maybeSingle();
+    // 1. 子密码列表 + 收款二维码
+    const { data: settings } = await SB.from('handrail_settings').select('extra_entries,pay_qr_url').eq('id', 1).maybeSingle();
     if (settings && Array.isArray(settings.extra_entries)) {
       const local = JSON.parse(localStorage.getItem(ADMIN_KEY) || '{}');
       local.extra_entries = settings.extra_entries;
@@ -857,12 +857,16 @@ async function sbPullFromCloud() {
     if (settings && settings.pay_qr_url) {
       localStorage.setItem(MEMBER_QR_KEY, settings.pay_qr_url);
     }
-    // 同步手机注册数据
-    if (settings && settings.phone_regs && typeof settings.phone_regs === 'object') {
-      const localRegs = getPhoneRegs();
-      // 合并：云端数据覆盖本地（以云端为准）
-      const merged = { ...localRegs, ...settings.phone_regs };
-      savePhoneRegs(merged);
+    // 同步手机注册数据（phone_regs 列可能不存在，单独尝试）
+    try {
+      const { data: regSettings } = await SB.from('handrail_settings').select('phone_regs').eq('id', 1).maybeSingle();
+      if (regSettings && regSettings.phone_regs && typeof regSettings.phone_regs === 'object') {
+        const localRegs = getPhoneRegs();
+        const merged = { ...localRegs, ...regSettings.phone_regs };
+        savePhoneRegs(merged);
+      }
+    } catch (regErr) {
+      console.warn('phone_regs sync skipped:', regErr.message || regErr);
     }
 
     // 2. 激活码列表
@@ -903,10 +907,27 @@ async function sbPushSettings() {
   try {
     const settings = getAdminSettings();
     const phoneRegs = getPhoneRegs();
+    // 先尝试完整推送（含 phone_regs）
+    try {
+      await SB.from('handrail_settings').upsert({
+        id: 1,
+        extra_entries: settings.extra_entries,
+        phone_regs: phoneRegs,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'id' });
+      return;
+    } catch(fullErr) {
+      const msg = (fullErr && fullErr.message) || String(fullErr);
+      if (msg.includes('phone_regs') || msg.includes('42703')) {
+        console.warn('phone_regs column missing, falling back to partial push');
+      } else {
+        throw fullErr;
+      }
+    }
+    // 降级推送：不含 phone_regs
     await SB.from('handrail_settings').upsert({
       id: 1,
       extra_entries: settings.extra_entries,
-      phone_regs: phoneRegs,
       updated_at: new Date().toISOString()
     }, { onConflict: 'id' });
   } catch(e) { console.warn('SB push settings failed:', e); }
@@ -1060,6 +1081,10 @@ function getAdminSettings() {
     let entries = raw.extra_entries || [];
     if (entries.length === 0 && Array.isArray(raw.extra) && raw.extra.length > 0) {
       entries = raw.extra.map(p => ({ password: p, boundDevice: null, boundLabel: null }));
+    }
+    // 兼容本地 extra_entries 仍为字符串数组的情况
+    if (Array.isArray(entries) && entries.length > 0 && typeof entries[0] === 'string') {
+      entries = entries.map(p => (typeof p === 'string' ? { password: p, boundDevice: null, boundLabel: null } : p));
     }
     return { password: raw.password || DEFAULT_PASSWORD, extra_entries: entries };
   } catch(e) { return { password: DEFAULT_PASSWORD, extra_entries: [] }; }
