@@ -821,6 +821,16 @@ function sbInit() {
       return true;
     }
   } catch(e) { console.warn('Supabase init failed:', e); }
+  // CDN 加载失败时延迟重试一次
+  setTimeout(() => {
+    if (SB) return;
+    try {
+      if (typeof supabase !== 'undefined' && supabase.createClient) {
+        SB = supabase.createClient(SB_URL, SB_KEY);
+        console.log('Supabase connected (retry)');
+      }
+    } catch(e2) { console.warn('Supabase retry failed:', e2); }
+  }, 1500);
   return false;
 }
 
@@ -830,7 +840,7 @@ async function sbPullFromCloud() {
   try {
     // 1. 子密码列表 + 手机注册数据
     const { data: settings } = await SB.from('handrail_settings').select('extra_entries,pay_qr_url,phone_regs').eq('id', 1).maybeSingle();
-    if (settings && settings.extra_entries && settings.extra_entries.length > 0) {
+    if (settings && Array.isArray(settings.extra_entries)) {
       const local = JSON.parse(localStorage.getItem(ADMIN_KEY) || '{}');
       local.extra_entries = settings.extra_entries;
       if (!local.password) local.password = DEFAULT_PASSWORD;
@@ -1235,31 +1245,38 @@ async function doLogin() {
   let result = isValidPassword(input);
 
   // 本地验证失败 → 尝试从云端拉取子密码再验证（新设备首次登录场景）
+  let cloudSyncFailed = false;
   if (!result.valid && SB) {
     btnEl.disabled = true;
     btnEl.textContent = '正在同步...';
-    errEl.textContent = '首次使用，正在同步数据...';
+    errEl.textContent = '首次使用，正在同步子密码...';
     try {
-      // 3秒超时，防止网络无响应卡死
+      // 5秒超时，防止网络无响应卡死
       await Promise.race([
         sbPullFromCloud(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('sync timeout')), 3000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('sync timeout')), 5000))
       ]);
       result = isValidPassword(input); // 拉取后再验证
     } catch(e) {
       console.warn('Cloud pull during login failed:', e);
+      cloudSyncFailed = true;
       if (window.location.protocol === 'file:') {
         errEl.textContent = '请通过 http://localhost 访问，不要直接打开 HTML 文件';
       } else {
-        errEl.textContent = '云端同步失败，请检查网络或联系管理员';
+        errEl.textContent = '⚠️ 云端同步失败，子密码无法验证。请检查网络、刷新页面或联系管理员';
       }
     }
     btnEl.disabled = false;
     btnEl.textContent = '登 录';
+    if (cloudSyncFailed) return; // 同步失败时不要覆盖成"密码错误"
   }
 
   if (!result.valid) {
-    errEl.textContent = '密码错误，请重试';
+    if (!SB) {
+      errEl.textContent = '⚠️ 网络同步组件未加载，子密码无法验证。请检查网络后刷新页面';
+    } else {
+      errEl.textContent = '密码错误，请重试';
+    }
     return;
   }
 
