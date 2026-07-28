@@ -1,7 +1,7 @@
 -- ============================================
 -- 智算扶手长 - Supabase 数据库建表脚本
 -- 请在 Supabase SQL Editor 中运行此脚本
--- Project URL: https://slboifvxrvtabuwcwtp.supabase.co
+-- Project URL: https://mlzdvwsolkqausywtpqu.supabase.co
 -- ============================================
 
 -- 1. 管理员设置（子密码列表、更新URL、收款二维码）
