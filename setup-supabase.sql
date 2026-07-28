@@ -4,12 +4,13 @@
 -- Project URL: https://mlzdvwsolkqausywtpqu.supabase.co
 -- ============================================
 
--- 1. 管理员设置（子密码列表、更新URL、收款二维码）
+-- 1. 管理员设置（子密码列表、更新URL、收款二维码、手机注册用户）
 CREATE TABLE IF NOT EXISTS handrail_settings (
   id int PRIMARY KEY DEFAULT 1 CHECK (id = 1),
   extra_entries jsonb DEFAULT '[]'::jsonb,
   update_url text DEFAULT '',
   pay_qr_url text DEFAULT '',
+  phone_regs jsonb DEFAULT '{}'::jsonb,
   updated_at timestamptz DEFAULT now()
 );
 
@@ -106,3 +107,6 @@ CREATE POLICY "history_delete" ON handrail_history FOR DELETE USING (true);
 CREATE INDEX IF NOT EXISTS idx_codes_plan ON handrail_member_codes(plan);
 CREATE INDEX IF NOT EXISTS idx_history_device ON handrail_history(device_id);
 CREATE INDEX IF NOT EXISTS idx_history_created ON handrail_history(created_at DESC);
+
+-- 追加：为已存在的表添加 phone_regs 列（忽略已存在的错误）
+ALTER TABLE handrail_settings ADD COLUMN IF NOT EXISTS phone_regs jsonb DEFAULT '{}'::jsonb;
