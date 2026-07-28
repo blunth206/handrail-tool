@@ -903,34 +903,26 @@ async function sbPullFromCloud() {
 
 // 推送子密码到云端（fire-and-forget）
 async function sbPushSettings() {
-  if (!SB) return;
+  if (!SB) { console.warn('sbPushSettings: SB not initialized'); return; }
   try {
     const settings = getAdminSettings();
-    const phoneRegs = getPhoneRegs();
-    // 先尝试完整推送（含 phone_regs）
-    try {
-      await SB.from('handrail_settings').upsert({
-        id: 1,
-        extra_entries: settings.extra_entries,
-        phone_regs: phoneRegs,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'id' });
-      return;
-    } catch(fullErr) {
-      const msg = (fullErr && fullErr.message) || String(fullErr);
-      if (msg.includes('phone_regs') || msg.includes('42703')) {
-        console.warn('phone_regs column missing, falling back to partial push');
-      } else {
-        throw fullErr;
-      }
-    }
-    // 降级推送：不含 phone_regs
-    await SB.from('handrail_settings').upsert({
+    const { error } = await SB.from('handrail_settings').upsert({
       id: 1,
       extra_entries: settings.extra_entries,
       updated_at: new Date().toISOString()
     }, { onConflict: 'id' });
-  } catch(e) { console.warn('SB push settings failed:', e); }
+    if (error) {
+      console.warn('sbPushSettings upsert error:', error);
+    } else {
+      console.log('sbPushSettings: synced', settings.extra_entries.length, 'sub passwords');
+    }
+  } catch(e) {
+    console.warn('sbPushSettings failed:', e.message || e);
+    if (e.message && e.message.includes('42703')) {
+      console.warn('Column missing in handrail_settings table. Please add the missing column.');
+    }
+  }
+}
 }
 
 // 推送激活码到云端
@@ -1104,6 +1096,23 @@ function getPhoneRegs() {
 }
 function savePhoneRegs(regs) {
   localStorage.setItem(PHONE_REGS_KEY, JSON.stringify(regs));
+  sbPushPhoneRegs(regs);
+}
+
+async function sbPushPhoneRegs(regs) {
+  if (!SB) return;
+  try {
+    const { error } = await SB.from('handrail_settings').upsert({
+      id: 1,
+      phone_regs: regs,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'id' });
+    if (error) console.warn('sbPushPhoneRegs upsert error:', error);
+  } catch(e) {
+    if (!e.message || (!e.message.includes('42703') && !e.message.includes('phone_regs'))) {
+      console.warn('sbPushPhoneRegs failed:', e.message || e);
+    }
+  }
 }
 
 async function phoneRegister() {
@@ -1512,7 +1521,7 @@ function addSubPassword() {
   if (settings.password === pwd) { showToast('子密码不能与主密码相同', 'warn'); return; }
   if (settings.extra_entries.some(e => e.password === pwd)) { showToast('该子密码已存在', 'warn'); return; }
   settings.extra_entries.push({ password: pwd, boundDevice: null, boundLabel: null });
-  saveSettingsToStorage(settings);
+  saveSettingsToStorage(settings); // 内部已调用 sbPushSettings
   input.value = '';
   renderSubPasswordList();
 }
@@ -1523,7 +1532,7 @@ function removeSubPassword(idx) {
   if (idx < 0 || idx >= settings.extra_entries.length) return;
   const removed = settings.extra_entries[idx];
   settings.extra_entries.splice(idx, 1);
-  saveSettingsToStorage(settings);
+  saveSettingsToStorage(settings); // 内部已调用 sbPushSettings
   renderSubPasswordList();
   showToast('已删除子密码：' + removed.password);
 }
@@ -1534,7 +1543,7 @@ function unbindDevice(idx) {
   if (idx < 0 || idx >= settings.extra_entries.length) return;
   settings.extra_entries[idx].boundDevice = null;
   settings.extra_entries[idx].boundLabel = null;
-  saveSettingsToStorage(settings);
+  saveSettingsToStorage(settings); // 内部已调用 sbPushSettings
   renderSubPasswordList();
   showToast('✅ 已解绑，该子密码可在新设备上登录');
 }
