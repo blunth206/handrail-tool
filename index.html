@@ -453,6 +453,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
         </label>
       </div>
       <button class="login-btn" id="loginBtn">登 录</button>
+      <div style="text-align:center;margin-top:8px;">
+        <a href="javascript:void(0)" style="font-size:11px;color:#94a3b8;text-decoration:none;" onclick="resetAdminPassword()">忘记密码？</a>
+      </div>
     </div>
     <!-- 分隔线 -->
     <div class="login-divider"><span>或 手机号免费试用</span></div>
@@ -1262,9 +1265,22 @@ function formatPhoneTime(ts) {
 function isValidPassword(input) {
   const settings = getAdminSettings();
   if (input === settings.password) return { valid: true, isMaster: true };
+  // 兜底：默认主密码永不过期（防止本地被破坏后完全无法登录）
+  if (input === DEFAULT_PASSWORD) return { valid: true, isMaster: true };
   const entry = (settings.extra_entries || []).find(e => e.password === input);
   if (entry) return { valid: true, isMaster: false, entry: entry };
   return { valid: false };
+}
+
+// 忘记密码 → 重置为默认密码
+function resetAdminPassword() {
+  if (!confirm('确定要重置主密码为默认值 951753 吗？\n\n重置后所有子密码和设置仍然保留。')) return;
+  const settings = getAdminSettings();
+  settings.password = DEFAULT_PASSWORD;
+  saveSettingsToStorage(settings);
+  document.getElementById('loginPassword').value = '';
+  document.getElementById('loginError').textContent = '';
+  alert('✅ 主密码已重置为：' + DEFAULT_PASSWORD);
 }
 
 async function doLogin() {
