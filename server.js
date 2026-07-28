@@ -4,7 +4,7 @@ const path = require('path');
 const os = require('os');
 
 const PORT = 2026;
-const mime = { 'html': 'text/html', 'js': 'text/javascript', 'css': 'text/css' };
+const mime = { 'html': 'text/html', 'js': 'text/javascript', 'css': 'text/css', 'json': 'application/json', 'apk': 'application/vnd.android.package-archive' };
 
 http.createServer((req, res) => {
   const f = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
