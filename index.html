@@ -28,16 +28,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
 .header-actions { display: flex; gap: 6px; flex-shrink: 0; padding-top: 2px; align-items: flex-start; position: relative; }
 .logout-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
 .logout-btn:hover { background: rgba(255,255,255,0.3); }
-/* 试用状态标签 */
-.trial-status { display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.35); color: #fff; height: 32px; border-radius: 8px; font-size: 12px; padding: 0 10px; white-space: nowrap; cursor: pointer; transition: background 0.2s; }
-.trial-status:hover { background: rgba(255,255,255,0.3); }
-.trial-status .ts-icon { font-size: 14px; }
-.trial-status .ts-day { font-weight: 700; }
-/* 会员按钮：位于头部操作区 */
-.vip-header-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; height: 32px; border-radius: 8px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0 8px; gap: 4px; transition: background 0.2s; white-space: nowrap; }
-.vip-header-btn:hover { background: rgba(255,255,255,0.3); }
-.vip-header-btn .vip-icon { font-size: 14px; }
-.vip-header-btn.lifetime { display: none !important; }
+
 /* 用户菜单按钮 */
 .user-menu-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; position: relative; }
 .user-menu-btn:hover { background: rgba(255,255,255,0.3); }
@@ -48,7 +39,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
 .user-dropdown-item:hover { background: #f1f5f9; }
 .user-dropdown-item .dd-icon { font-size: 15px; width: 20px; text-align: center; }
 .user-dropdown-divider { height: 1px; background: #e2e8f0; }
-/* 废弃旧版悬浮会员按钮 */
+.user-dropdown-account { padding: 10px 14px; font-size: 12px; color: #64748b; background: #f8fafc; border-bottom: 1px solid #e2e8f0; line-height: 1.6; }
+.user-dropdown-account .uda-type { font-weight: 600; color: #1e293b; }
+.user-dropdown-account .uda-id { color: #3b82f6; font-weight: 500; }
+/* 旧版会员按钮（已废弃） */
 .member-btn { display: none !important; }
 
 /* Main layout - mobile centered */
@@ -278,10 +272,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
 .login-box .phone-register-btn { width: 100%; padding: 12px; border: 2px solid #10b981; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; background: #fff; color: #10b981; transition: all 0.2s; }
 .login-box .phone-register-btn:hover { background: #10b981; color: #fff; }
 .login-box .phone-register-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.login-box .trial-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-top: 6px; }
-.login-box .trial-badge.active { background: #ecfdf5; color: #059669; }
-.login-box .trial-badge.expired { background: #fef2f2; color: #dc2626; }
-.login-box .trial-badge.warning { background: #fffbeb; color: #d97706; }
 
 .main-content { transition: filter 0.3s; }
 .main-content.blurred { filter: blur(6px); pointer-events: none; }
@@ -310,6 +300,25 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
 .sub-pwd-item .pwd-status.bound { background: #dcfce7; color: #166534; }
 .sub-pwd-item .pwd-status.unbound { background: #fef9c3; color: #92400e; }
 .sub-pwd-item .btn-pwd-action { border: none; background: none; font-size: 16px; cursor: pointer; padding: 0 2px; line-height: 1; opacity: 0.5; flex-shrink: 0; }
+.sub-pwd-item .btn-pwd-action:hover { opacity: 1; }
+.sub-pwd-expiry { font-size: 10px; padding: 2px 6px; border-radius: 8px; white-space: nowrap; flex-shrink: 0; }
+.sub-pwd-expiry.permanent { background: #dbeafe; color: #1e40af; }
+.sub-pwd-expiry.active { background: #dcfce7; color: #166534; }
+.sub-pwd-expiry.expiring { background: #fef9c3; color: #92400e; }
+.sub-pwd-expiry.expired { background: #fce4ec; color: #b71c1c; }
+.sub-pwd-item.expired-row { opacity: 0.6; background: #fff5f5; border-color: #fecaca; }
+.sub-pwd-add-row { display: flex; gap: 4px; margin-top: 6px; }
+.sub-pwd-add-row input { flex: 2; padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; }
+.sub-pwd-add-row button { flex-shrink: 0; padding: 5px 12px; border: none; border-radius: 6px; background: #3b82f6; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; }
+.sub-pwd-add-row button:hover { background: #2563eb; }
+.sub-pwd-expiry-row { display: flex; gap: 3px; margin-top: 4px; flex-wrap: wrap; }
+.sub-pwd-expiry-btn { padding: 3px 8px; border: 1px solid #cbd5e1; border-radius: 12px; background: #f8fafc; color: #64748b; font-size: 11px; cursor: pointer; transition: all 0.15s; white-space: nowrap; user-select: none; }
+.sub-pwd-expiry-btn:hover { border-color: #93c5fd; color: #2563eb; background: #eff6ff; }
+.sub-pwd-expiry-btn.active { border-color: #3b82f6; background: #3b82f6; color: #fff; font-weight: 600; }
+.sub-pwd-expiry-mini-row { display: flex; gap: 4px; margin: 10px 0 4px; flex-wrap: wrap; }
+.sub-pwd-expiry-mini-row .sub-pwd-expiry-btn { padding: 4px 10px; font-size: 12px; }
+.expiry-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+.expiry-modal-box { background: #fff; border-radius: 12px; padding: 20px; max-width: 360px; width: 90%; box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
 .sub-pwd-item .btn-pwd-action:hover { opacity: 1; }
 .sub-pwd-item .btn-unbind { color: #d97706; }
 .sub-pwd-item .btn-delete { color: #dc2626; }
@@ -355,68 +364,30 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
 .ios-guide-arrow { font-size: 32px; animation: bounce-up 1.5s ease infinite; }
 @keyframes bounce-up { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
 
-/* 会员中心 */
-.member-badge { position: fixed; top: 8px; left: 50%; transform: translateX(-50%); z-index: 9998; background: #10b981; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; box-shadow: 0 2px 6px rgba(16,185,129,0.3); pointer-events: none; }
-.member-modal-box { background: #fff; border-radius: 12px; width: 100%; max-width: 460px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
-.member-modal-box .modal-body { flex: 1; overflow-y: auto; min-height: 0; }
-.member-status-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; border-radius: 12px; margin-bottom: 16px; }
-.member-status-bar.free { background: linear-gradient(135deg,#f8fafc,#f1f5f9); border: 1.5px solid #e2e8f0; }
-.member-status-bar.active { background: linear-gradient(135deg,#ecfdf5,#d1fae5); border: 1.5px solid #6ee7b7; }
-.member-status-bar.expired { background: linear-gradient(135deg,#fef2f2,#fee2e2); border: 1.5px solid #fca5a5; }
-.member-status-left { display: flex; align-items: center; gap: 8px; }
-.member-status-icon { font-size: 28px; }
-.member-status-info { line-height: 1.4; }
-.member-status-label { font-size: 11px; color: #64748b; }
-.member-status-value { font-size: 15px; font-weight: 700; color: #1e293b; }
-.member-status-expiry { font-size: 11px; color: #64748b; }
-.member-plans { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-.member-plan-card { border: 2px solid #e2e8f0; border-radius: 12px; padding: 16px 12px; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
-.member-plan-card:hover { border-color: #f59e0b; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,158,11,0.15); }
-.member-plan-card.selected { border-color: #f59e0b; background: #fffbeb; }
-.member-plan-card.featured::before { content: '推荐'; position: absolute; top: 8px; right: -22px; background: #dc2626; color: #fff; font-size: 9px; font-weight: 700; padding: 2px 22px; transform: rotate(45deg); }
-.member-plan-icon { font-size: 32px; margin-bottom: 6px; }
-.member-plan-name { font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
-.member-plan-price { font-size: 26px; font-weight: 800; color: #f59e0b; margin-bottom: 2px; }
-.member-plan-price-unit { font-size: 13px; font-weight: 500; color: #64748b; }
-.member-plan-desc { font-size: 11px; color: #94a3b8; margin-top: 4px; }
-.member-btn-row { display: flex; gap: 10px; }
-.member-btn-pay { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; background: linear-gradient(135deg,#f59e0b,#d97706); color: #fff; box-shadow: 0 4px 14px rgba(245,158,11,0.35); transition: all 0.2s; }
-.member-btn-pay:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245,158,11,0.45); }
-.member-btn-pay:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-.member-activate-section { border-top: 1px solid #e2e8f0; padding-top: 14px; margin-top: 14px; }
-.member-activate-title { font-size: 13px; font-weight: 700; color: #475569; margin-bottom: 8px; }
-.member-activate-row { display: flex; gap: 8px; }
-.member-activate-input { flex: 1; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; font-size: 14px; font-family: inherit; letter-spacing: 2px; }
-.member-activate-input:focus { outline: none; border-color: #3b82f6; }
-.member-activate-btn { padding: 10px 18px; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; background: #3b82f6; color: #fff; white-space: nowrap; }
-.member-activate-btn:hover { background: #2563eb; }
-.member-activate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.member-pay-qr { text-align: center; padding: 16px; }
-.member-pay-qr img { width: 180px; height: 180px; border: 1px solid #e2e8f0; border-radius: 12px; object-fit: contain; background: #fff; }
-.member-pay-qr-placeholder { width: 180px; height: 180px; margin: 0 auto; border: 2px dashed #e2e8f0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 12px; gap: 6px; }
-.member-pay-info { font-size: 13px; color: #475569; margin-top: 10px; font-weight: 600; }
-.member-pay-amount { font-size: 28px; font-weight: 800; color: #dc2626; }
-/* 管理面板中的激活码管理 */
-.member-admin-section { border-top: 1px solid #e2e8f0; margin-top: 10px; padding-top: 10px; }
-.member-admin-title { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 6px; }
-.member-admin-row { display: flex; gap: 6px; margin-bottom: 8px; }
-.member-admin-row select { flex: 1; border: 1.5px solid #e2e8f0; border-radius: 6px; padding: 6px 8px; font-size: 11px; font-family: inherit; cursor: pointer; }
-.member-admin-row button { padding: 6px 12px; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; background: #f59e0b; color: #fff; white-space: nowrap; }
-.member-admin-row button:hover { background: #d97706; }
+/* 管理面板区块 */
+.admin-section { border-top: 1px solid #e2e8f0; margin-top: 10px; padding-top: 10px; }
+.admin-section-title { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 6px; }
+.admin-section-row { display: flex; gap: 6px; margin-bottom: 8px; }
+.admin-section-row select { flex: 1; border: 1.5px solid #e2e8f0; border-radius: 6px; padding: 6px 8px; font-size: 11px; font-family: inherit; cursor: pointer; }
+.admin-section-row button { padding: 6px 12px; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; background: #f59e0b; color: #fff; white-space: nowrap; }
+.admin-section-row button:hover { background: #d97706; }
 .phone-user-list { margin-top: 6px; }
+.phone-reg-toggle { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; font-size: 12px; color: #475569; }
+.phone-reg-toggle input[type=checkbox] { width: 16px; height: 16px; accent-color: #22c55e; cursor: pointer; }
+.phone-reg-toggle label { cursor: pointer; user-select: none; }
 .phone-user-item { padding: 6px 8px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 4px; background: #f8fafc; }
 .phone-user-item .pu-info { display: flex; align-items: center; justify-content: space-between; }
 .phone-user-item .pu-phone { font-size: 12px; font-weight: 600; color: #1e293b; }
 .phone-user-item .pu-meta { font-size: 10px; color: #94a3b8; margin-top: 2px; }
-.member-code-list { max-height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
-.member-code-item { display: flex; align-items: center; justify-content: space-between; padding: 4px 8px; background: #f8fafc; border-radius: 6px; font-size: 10px; gap: 6px; }
-.member-code-item code { font-size: 11px; font-family: 'Courier New', monospace; background: #e2e8f0; padding: 1px 6px; border-radius: 4px; cursor: pointer; user-select: all; }
-.member-code-status { font-size: 10px; padding: 1px 6px; border-radius: 8px; font-weight: 600; }
-.member-code-status.used { background: #dcfce7; color: #166534; }
-.member-code-status.unused { background: #fef3c7; color: #92400e; }
-.member-code-del { font-size: 14px; cursor: pointer; color: #dc2626; background: none; border: none; line-height: 1; }
-.member-code-copy { font-size: 14px; cursor: pointer; background: #dbeafe; border: 1px solid #93c5fd; border-radius: 4px; padding: 2px 6px; line-height: 1; transition: background 0.15s; }
-.member-code-copy:hover { background: #bfdbfe; }
+.phone-user-item .pu-actions { display: flex; gap: 4px; margin-top: 4px; }
+.phone-user-item .pu-disable-btn { padding: 2px 8px; border: 1px solid #f59e0b; border-radius: 10px; background: #fff; color: #f59e0b; font-size: 11px; cursor: pointer; transition: all 0.15s; }
+.phone-user-item .pu-disable-btn:hover { background: #f59e0b; color: #fff; }
+.phone-user-item .pu-disable-btn.enabled { border-color: #22c55e; color: #22c55e; }
+.phone-user-item .pu-disable-btn.enabled:hover { background: #22c55e; color: #fff; }
+.phone-user-item .pu-delete-btn { padding: 2px 8px; border: 1px solid #dc2626; border-radius: 10px; background: #fff; color: #dc2626; font-size: 13px; cursor: pointer; transition: all 0.15s; line-height: 1; }
+.phone-user-item .pu-delete-btn:hover { background: #dc2626; color: #fff; }
+.phone-user-item.disabled-row { opacity: 0.55; background: #fef2f2; border-color: #fecaca; }
+.phone-user-item.disabled-row .pu-phone { text-decoration: line-through; }
 /* 毫米单位规格字体自适应列宽 */
 .spec-chips.mm-unit .prod-chip { font-size: 13px; font-weight: 600; padding: 7px 6px; gap: 3px; width: 100%; box-sizing: border-box; white-space: nowrap; }
 .spec-chips.mm-unit .prod-chip .chip-text { white-space: nowrap; overflow: visible; flex: 1; min-width: 0; }
@@ -430,7 +401,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
 .products-ref.has-unit { grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .products-ref.has-unit .prod-col { min-width: 85px; padding: 6px 4px; }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" onerror="window._sbFailed=1"></script>
 </head>
 <body>
 
@@ -444,7 +415,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
     <div id="pwdSection">
       <div class="input-group">
         <label>密码</label>
-        <input type="password" id="loginPassword" placeholder="管理员或会员密码" autocomplete="off">
+        <input type="password" id="loginPassword" placeholder="管理员或子密码" autocomplete="off">
       </div>
       <div class="login-input-group">
         <label class="login-remember">
@@ -458,16 +429,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
       </div>
     </div>
     <!-- 分隔线 -->
-    <div class="login-divider"><span>或 手机号免费试用</span></div>
+    <div id="loginPhoneGroup">
+    <div class="login-divider"><span>或 手机号登录</span></div>
     <!-- 手机号注册 -->
     <div class="phone-group">
       <label>手机号</label>
-      <input type="tel" id="phoneInput" placeholder="输入手机号，7天免费试用" autocomplete="off" maxlength="11">
+      <input type="tel" id="phoneInput" placeholder="输入手机号，免费试用3天" autocomplete="off" maxlength="11">
     </div>
-    <div id="phoneTrialStatus" style="display:none;"></div>
     <button class="phone-register-btn" id="phoneRegisterBtn" onclick="phoneRegister()">注册 / 登录</button>
+    </div>
     <p class="login-error" id="loginError"></p>
-    <p class="login-hint">管理员请用密码登录 · 永久会员请联系管理员开通</p>
+    <p class="login-hint">管理员请用密码登录 · 子密码由管理员发放</p>
   </div>
 </div>
 
@@ -492,52 +464,41 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
     <input type="text" id="newSubPassword" placeholder="输入新子密码" autocomplete="off">
     <button onclick="addSubPassword()">添加</button>
   </div>
+  <div class="sub-pwd-expiry-row" id="subPwdExpiryBtns">
+    <span class="sub-pwd-expiry-btn" data-days="3" onclick="selectExpiryBtn(this)">3天</span>
+    <span class="sub-pwd-expiry-btn" data-days="7" onclick="selectExpiryBtn(this)">7天</span>
+    <span class="sub-pwd-expiry-btn" data-days="15" onclick="selectExpiryBtn(this)">15天</span>
+    <span class="sub-pwd-expiry-btn" data-days="30" onclick="selectExpiryBtn(this)">1个月</span>
+    <span class="sub-pwd-expiry-btn" data-days="90" onclick="selectExpiryBtn(this)">3个月</span>
+    <span class="sub-pwd-expiry-btn" data-days="180" onclick="selectExpiryBtn(this)">6个月</span>
+    <span class="sub-pwd-expiry-btn" data-days="365" onclick="selectExpiryBtn(this)">1年</span>
+    <span class="sub-pwd-expiry-btn active" data-days="0" onclick="selectExpiryBtn(this)">永久</span>
+  </div>
   <div class="admin-hint">💡 子密码首次使用时自动绑定当前设备，绑定后其他设备无法使用同一密码登录。用户更换设备后，管理员可在绑定状态旁点击 🔓 解绑。</div>
-  <!-- 会员激活码管理 -->
-  <div class="member-admin-section">
-    <div class="member-admin-title">💳 会员激活码管理</div>
-    <div class="member-admin-row">
-      <select id="memberCodeType">
-        <option value="yearly">包年 (5元)</option>
-        <option value="lifetime">买断 (30元)</option>
-      </select>
-      <button onclick="generateMemberCode()">生成激活码</button>
-    </div>
-    <div class="member-code-list" id="memberCodeList">
-      <div style="font-size:10px;color:#94a3b8;">暂无激活码，点击上方按钮生成</div>
-    </div>
-  </div>
-  <!-- 收款二维码配置 -->
-  <div class="member-admin-section">
-    <div class="member-admin-title">📱 收款二维码</div>
-    <div class="member-admin-row">
-      <input type="text" id="memberPayQRUrl" placeholder="或直接粘贴图片URL" style="flex:1;border:1.5px solid #e2e8f0;border-radius:6px;padding:6px 8px;font-size:11px;font-family:inherit;">
-      <label style="padding:6px 12px;background:#3b82f6;color:#fff;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">📁 上传<input type="file" id="memberQRUpload" accept="image/*" onchange="handleQRUpload(this)" style="display:none;"></label>
-      <button onclick="saveMemberQR()">保存</button>
-    </div>
-    <div id="memberQRPreview" style="margin-top:6px;display:none;"><img id="memberQRPreviewImg" style="max-width:100px;max-height:100px;border-radius:6px;border:1px solid #e2e8f0;"></div>
-    <div style="font-size:10px;color:#94a3b8;">支持直接上传图片或粘贴图床URL</div>
-  </div>
   <!-- APP更新 -->
-  <div class="member-admin-section">
-    <div class="member-admin-title">🔄 APP更新</div>
+  <div class="admin-section">
+    <div class="admin-section-title">🔄 APP更新</div>
     <div class="update-row">
       <span id="updateStatus" style="font-size:11px;color:#64748b;">当前版本：v1.0</span>
       <button onclick="checkForUpdate()" style="padding:6px 12px;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;background:#3b82f6;color:#fff;">检查更新</button>
     </div>
     <div id="updateInfo" style="display:none;margin-top:8px;font-size:11px;color:#475569;"></div>
-    <div class="member-admin-row" id="updateDownloadRow" style="display:none;">
+    <div class="admin-section-row" id="updateDownloadRow" style="display:none;">
       <input type="text" id="updateURL" placeholder="输入APK下载链接" style="flex:1;border:1.5px solid #e2e8f0;border-radius:6px;padding:6px 8px;font-size:11px;font-family:inherit;">
       <button onclick="downloadUpdate()">下载更新</button>
     </div>
   </div>
   <!-- 手机注册用户管理 -->
-  <div class="member-admin-section" id="phoneUserAdminSection">
-    <div class="member-admin-title">📱 手机注册用户（试用7天）</div>
+  <div class="admin-section" id="phoneUserAdminSection">
+    <div class="admin-section-title">📱 手机注册用户</div>
+    <div class="phone-reg-toggle">
+      <input type="checkbox" id="phoneRegEnabledChk" checked onchange="setPhoneRegEnabled(this.checked)">
+      <label for="phoneRegEnabledChk">启用手机注册（关闭后新用户无法注册登录）</label>
+    </div>
     <div class="phone-user-list" id="phoneUserList">
       <div style="font-size:10px;color:#94a3b8;">暂无注册用户</div>
     </div>
-    <div style="font-size:10px;color:#94a3b8;margin-top:4px;">💡 已注册手机号可享受7天试用；管理员可给试用户分配永久子密码</div>
+    <div style="font-size:10px;color:#94a3b8;margin-top:4px;">💡 手机号默认3天试用，点击有效期标签可修改；管理员可随时调整试用期限</div>
   </div>
   <div class="admin-btns">
     <button class="btn-save" onclick="saveAdminSettings()">保存</button>
@@ -567,13 +528,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
       <p>输入客户需求尺寸，自动计算最优组合方案，最小化浪费</p>
     </div>
     <div class="header-actions">
-      <div class="trial-status" id="trialStatus" style="display:none;" onclick="toggleMemberModal()">
-        <span class="ts-icon">📱</span>试用<span class="ts-day" id="trialDayCount"></span>
-      </div>
-      <button class="vip-header-btn" id="vipBtn" title="会员中心" onclick="toggleMemberModal()"><span class="vip-icon">👑</span>VIP</button>
       <button class="user-menu-btn" id="userMenuBtn" title="用户菜单" onclick="toggleUserMenu()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="8" r="4" fill="white"/><path d="M4 22c0-4.418 3.582-8 8-8s8 3.582 8 8" fill="white"/></svg></button>
       <div class="user-dropdown" id="userDropdown">
-        <button class="user-dropdown-item" id="ddAccountManage" onclick="openAccountManage()"><span class="dd-icon">👑</span>账号管理</button>
+        <div class="user-dropdown-account" id="ddAccountInfo"></div>
+        <div class="user-dropdown-divider"></div>
+        <button class="user-dropdown-item" id="ddAccountManage" onclick="openAccountManage()"><span class="dd-icon">🔑</span>关于</button>
         <button class="user-dropdown-item" id="ddVersionUpdate" onclick="checkVersionUpdate()"><span class="dd-icon">🔄</span>版本更新</button>
         <div class="user-dropdown-divider" id="ddDivider"></div>
         <button class="user-dropdown-item" id="ddLogout" onclick="doLogout()" style="color:#dc2626;"><span class="dd-icon">🚪</span>退出登录</button>
@@ -627,6 +586,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
         </div>
       </div>
 
+      <!-- Quick result stats -->
+      <div class="quick-stats" id="quickStats">
+        <div class="quick-stats-header">
+          <div class="quick-stats-title">📊 最优组合方案</div>
+          <div class="quick-stats-sub">下面查看组合结果（可核对）</div>
+        </div>
+        <div class="quick-stats-list" id="quickStatsList"></div>
+      </div>
+
       <!-- Customer info -->
       <div class="customer-input-section" style="margin-top:10px;padding:12px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;">
         <div class="card-title" style="margin-bottom:8px;"><span class="icon">📋</span> 客户需求输入</div>
@@ -655,17 +623,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
       <div style="text-align:center;margin:8px 0;">
         <button class="btn-spec" onclick="openPasteModal()" style="background:#dbeafe;color:#1e40af;font-size:18px;padding:10px 18px;">📋 粘贴识别</button>
       </div>
-
-      <!-- Quick result stats -->
-      <div class="quick-stats" id="quickStats">
-        <div class="quick-stats-header">
-          <div class="quick-stats-title">📊 最优组合方案</div>
-          <div class="quick-stats-sub">下面查看组合结果（可核对）</div>
-        </div>
-        <div class="quick-stats-list" id="quickStatsList"></div>
-      </div>
-
-
 
       <div class="tip-box">
         <strong>💡 规则说明：</strong><br>
@@ -735,82 +692,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
   </div>
 </div>
 
-<!-- Membership center modal -->
-<div class="modal-overlay" id="memberOverlay">
-  <div class="member-modal-box" id="memberModal">
-  <div class="modal-header">
-    <div class="modal-title">💰 会员中心</div>
-    <button class="modal-close" onclick="closeMemberModal()">×</button>
-  </div>
-  <div class="modal-body" style="padding-top:12px;">
-  <div class="member-status-bar free" id="memberStatusBar">
-    <div class="member-status-left">
-      <div class="member-status-icon" id="memberStatusIcon">🆓</div>
-      <div class="member-status-info">
-        <div class="member-status-label" id="memberStatusLabel">当前状态</div>
-        <div class="member-status-value" id="memberStatusValue">免费用户</div>
-        <div class="member-status-expiry" id="memberStatusExpiry"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="member-plans">
-    <div class="member-plan-card" id="planYearly" onclick="selectMemberPlan('yearly')">
-      <div class="member-plan-icon">📅</div>
-      <div class="member-plan-name">包年订阅</div>
-      <div class="member-plan-price">5<span class="member-plan-price-unit">元/年</span></div>
-      <div class="member-plan-desc">一年内无限使用全部功能</div>
-    </div>
-    <div class="member-plan-card featured" id="planLifetime" onclick="selectMemberPlan('lifetime')">
-      <div class="member-plan-icon">👑</div>
-      <div class="member-plan-name">永久买断</div>
-      <div class="member-plan-price">30<span class="member-plan-price-unit">元/永久</span></div>
-      <div class="member-plan-desc">一次购买，终身使用</div>
-    </div>
-  </div>
-
-  <!-- Payment step -->
-  <div id="memberPayStep" style="display:none;">
-    <div class="member-pay-qr" id="memberPayQR">
-      <div class="member-pay-qr-placeholder" id="memberPayPlaceholder">
-        <div style="font-size:40px;">📱</div>
-        <div>请在此处放置</div>
-        <div>收款二维码图片</div>
-        <div style="font-size:10px;color:#94a3b8;">管理员可在"管理设置"中配置</div>
-      </div>
-      <img id="memberPayQRImg" src="" alt="收款二维码" style="display:none;" onerror="this.style.display='none';document.getElementById('memberPayPlaceholder').style.display='flex';">
-    </div>
-    <div class="member-pay-info">
-      请支付 <span class="member-pay-amount" id="memberPayAmount">5.00</span> 元
-    </div>
-    <div class="member-pay-tips" style="text-align:center;font-size:12px;color:#64748b;margin-bottom:8px;">
-      请使用 <b>支付宝</b> 或 <b>微信</b> 扫一扫付款
-    </div>
-    <!-- 自动弹出激活码区域 -->
-    <div id="memberAutoCode" style="display:none;text-align:center;margin:12px 0;padding:12px;background:#f0fdf4;border:2px solid #10b981;border-radius:10px;">
-      <div style="font-size:12px;color:#166534;margin-bottom:6px;font-weight:600;">🎁 付款后请点击下方按钮立即激活</div>
-      <div style="font-size:22px;font-weight:800;font-family:'Courier New',monospace;color:#10b981;letter-spacing:2px;padding:8px 16px;background:#fff;border-radius:8px;display:inline-block;border:2px dashed #10b981;margin-bottom:8px;" id="memberAutoCodeText"></div>
-      <div style="margin-top:6px;">
-        <button class="member-activate-btn" id="memberAutoActivateBtn" style="font-size:14px;padding:10px 28px;background:#10b981;" onclick="activateAutoCode()">✅ 一键激活</button>
-      </div>
-    </div>
-    <div class="member-pay-tips" style="text-align:center;font-size:11px;color:#94a3b8;margin-bottom:10px;" id="memberManualTip">
-      或手动输入管理员提供的激活码
-    </div>
-    <div class="member-activate-section" style="border-top:none;margin-top:0;padding-top:8px;" id="memberManualInput">
-      <div class="member-activate-title">🔑 输入激活码</div>
-      <div class="member-activate-row">
-        <input class="member-activate-input" id="memberActivateCode" placeholder="请输入8位激活码" maxlength="16" autocomplete="off">
-        <button class="member-activate-btn" id="memberActivateBtn" onclick="activateMember()">激活</button>
-      </div>
-    </div>
-    <div id="memberActivateMsg" style="font-size:11px;margin-top:4px;text-align:center;"></div>
-    <button class="btn btn-secondary" style="margin-top:10px;width:100%;" onclick="closeMemberPayment()">← 返回选择方案</button>
-  </div>
-  </div><!-- /modal-body -->
-</div><!-- /member-modal-box -->
-</div><!-- /modal-overlay -->
-
 <script>
 'use strict';
 
@@ -832,16 +713,28 @@ function sbInit() {
       return true;
     }
   } catch(e) { console.warn('Supabase init failed:', e); }
-  // CDN 加载失败时延迟重试一次
+  // CDN 加载中或失败时延迟重试
   setTimeout(() => {
-    if (SB) return;
+    if (SB && SB !== false) return;
     try {
       if (typeof supabase !== 'undefined' && supabase.createClient) {
         SB = supabase.createClient(SB_URL, SB_KEY);
-        console.log('Supabase connected (retry)');
+        console.log('Supabase connected (retry 1)');
       }
-    } catch(e2) { console.warn('Supabase retry failed:', e2); }
-  }, 1500);
+    } catch(e2) { /* retry */ }
+  }, 2000);
+  setTimeout(() => {
+    if (SB && SB !== false) return;
+    try {
+      if (typeof supabase !== 'undefined' && supabase.createClient) {
+        SB = supabase.createClient(SB_URL, SB_KEY);
+        console.log('Supabase connected (retry 2)');
+      } else {
+        console.warn('Supabase CDN unavailable - running in offline mode');
+        SB = false;
+      }
+    } catch(e3) { SB = false; }
+  }, 6000);
   return false;
 }
 
@@ -849,16 +742,13 @@ function sbInit() {
 async function sbPullFromCloud() {
   if (!SB) return;
   try {
-    // 1. 子密码列表 + 收款二维码
-    const { data: settings } = await SB.from('handrail_settings').select('extra_entries,pay_qr_url').eq('id', 1).maybeSingle();
+    // 1. 子密码列表
+    const { data: settings } = await SB.from('handrail_settings').select('extra_entries').eq('id', 1).maybeSingle();
     if (settings && Array.isArray(settings.extra_entries)) {
       const local = JSON.parse(localStorage.getItem(ADMIN_KEY) || '{}');
       local.extra_entries = settings.extra_entries;
       if (!local.password) local.password = DEFAULT_PASSWORD;
       localStorage.setItem(ADMIN_KEY, JSON.stringify(local));
-    }
-    if (settings && settings.pay_qr_url) {
-      localStorage.setItem(MEMBER_QR_KEY, settings.pay_qr_url);
     }
     // 同步手机注册数据（phone_regs 列可能不存在，单独尝试）
     try {
@@ -872,23 +762,7 @@ async function sbPullFromCloud() {
       console.warn('phone_regs sync skipped:', regErr.message || regErr);
     }
 
-    // 2. 激活码列表
-    const { data: codes } = await SB.from('handrail_member_codes').select('*');
-    if (codes && codes.length > 0) {
-      localStorage.setItem(MEMBER_CODES_KEY, JSON.stringify(
-        codes.map(c => ({ code: c.code, plan: c.plan, used: c.used, usedAt: c.used_at, createdAt: c.created_at }))
-      ));
-    }
-
-    // 3. 当前设备会员状态
-    const deviceId = getDeviceId();
-    const { data: mdata } = await SB.from('handrail_member_data').select('*').eq('device_id', deviceId).maybeSingle();
-    if (mdata) {
-      const member = { type: mdata.type, expiry: mdata.expiry, active: mdata.active };
-      localStorage.setItem(MEMBER_KEY, JSON.stringify(member));
-    }
-
-    // 4. 规格配置
+    // 2. 规格配置
     const { data: specRow } = await SB.from('handrail_specs').select('config').eq('id', 1).maybeSingle();
     if (specRow && specRow.config && Object.keys(specRow.config).length > 0) {
       localStorage.setItem(SPEC_KEY, JSON.stringify(specRow.config));
@@ -904,9 +778,10 @@ async function sbPullFromCloud() {
   } catch(e) { console.warn('Supabase pull failed:', e); }
 }
 
-// 推送子密码到云端（fire-and-forget）
+// 推送子密码和手机注册数据到云端（fire-and-forget，独立推送互不干扰）
 async function sbPushSettings() {
   if (!SB) { console.warn('sbPushSettings: SB not initialized'); return; }
+  // 1. 先推送子密码（关键数据，确保不受其他列影响）
   try {
     const settings = getAdminSettings();
     const { error } = await SB.from('handrail_settings').upsert({
@@ -915,56 +790,32 @@ async function sbPushSettings() {
       updated_at: new Date().toISOString()
     }, { onConflict: 'id' });
     if (error) {
-      console.warn('sbPushSettings upsert error:', error);
+      console.warn('sbPushSettings extra_entries error:', error);
     } else {
       console.log('sbPushSettings: synced', settings.extra_entries.length, 'sub passwords');
     }
   } catch(e) {
-    console.warn('sbPushSettings failed:', e.message || e);
-    if (e.message && e.message.includes('42703')) {
-      console.warn('Column missing in handrail_settings table. Please add the missing column.');
-    }
+    console.warn('sbPushSettings extra_entries failed:', e.message || e);
   }
-}
-}
-
-// 推送激活码到云端
-async function sbPushCodes() {
-  if (!SB) return;
+  // 2. 再推送手机注册数据（如果 phone_regs 列不存在也不会影响子密码推送）
   try {
-    // 全量替换：先删再批量插入
-    await SB.from('handrail_member_codes').delete().neq('code', '___NONE___');
-    if (memberCodes.length > 0) {
-      const rows = memberCodes.map(c => ({ code: c.code, plan: c.plan, used: c.used || false, used_at: c.usedAt || null, created_at: c.createdAt || new Date().toISOString() }));
-      await SB.from('handrail_member_codes').insert(rows);
-    }
-  } catch(e) { console.warn('SB push codes failed:', e); }
-}
-
-// 推送会员状态到云端
-async function sbPushMemberData() {
-  if (!SB) return;
-  try {
-    await SB.from('handrail_member_data').upsert({
-      device_id: getDeviceId(),
-      type: memberData.type,
-      expiry: memberData.expiry,
-      active: memberData.active,
-      updated_at: new Date().toISOString()
-    }, { onConflict: 'device_id' });
-  } catch(e) { console.warn('SB push member failed:', e); }
-}
-
-// 推送收款二维码到云端
-async function sbPushPayQR(qrUrl) {
-  if (!SB) return;
-  try {
-    await SB.from('handrail_settings').upsert({
+    const phoneRegs = getPhoneRegs();
+    const { error } = await SB.from('handrail_settings').upsert({
       id: 1,
-      pay_qr_url: qrUrl,
+      phone_regs: phoneRegs,
       updated_at: new Date().toISOString()
     }, { onConflict: 'id' });
-  } catch(e) { console.warn('SB push QR failed:', e); }
+    if (error) {
+      console.warn('sbPushSettings phone_regs error:', error);
+    } else {
+      console.log('sbPushSettings: synced', Object.keys(phoneRegs).length, 'phone users');
+    }
+  } catch(e) {
+    console.warn('sbPushSettings phone_regs failed:', e.message || e);
+    if (e.message && e.message.includes('42703')) {
+      console.warn('Column "phone_regs" missing in handrail_settings. Add it in Supabase: ALTER TABLE handrail_settings ADD COLUMN phone_regs JSONB;');
+    }
+  }
 }
 
 // 推送规格配置到云端
@@ -1092,7 +943,7 @@ function saveSettingsToStorage(settings) {
 
 // ===== 手机号注册管理 =====
 const PHONE_REGS_KEY = 'handrail_phone_regs';
-const TRIAL_DAYS = 7;
+const PHONE_REG_ENABLED_KEY = 'handrail_phone_reg_enabled';
 
 function getPhoneRegs() {
   try { return JSON.parse(localStorage.getItem(PHONE_REGS_KEY)) || {}; } catch(e) { return {}; }
@@ -1100,6 +951,42 @@ function getPhoneRegs() {
 function savePhoneRegs(regs) {
   localStorage.setItem(PHONE_REGS_KEY, JSON.stringify(regs));
   sbPushPhoneRegs(regs);
+}
+
+// 手机注册开关
+function isPhoneRegEnabled() {
+  return localStorage.getItem(PHONE_REG_ENABLED_KEY) !== '0';
+}
+function setPhoneRegEnabled(flag) {
+  localStorage.setItem(PHONE_REG_ENABLED_KEY, flag ? '1' : '0');
+  // 刷新登录页显隐
+  const phoneGroup = document.getElementById('loginPhoneGroup');
+  if (phoneGroup) phoneGroup.style.display = flag ? '' : 'none';
+}
+
+// 禁用/启用单个手机用户
+function disablePhoneUser(phone) {
+  const regs = getPhoneRegs();
+  if (!regs[phone]) return;
+  if (regs[phone].disabled) {
+    delete regs[phone].disabled;
+    showToast('「' + phone + '」已恢复使用', 'ok');
+  } else {
+    regs[phone].disabled = true;
+    showToast('「' + phone + '」已被禁用', 'warn');
+  }
+  savePhoneRegs(regs);
+  renderPhoneUserList();
+}
+
+// 删除单个手机用户
+function deletePhoneUser(phone) {
+  if (!confirm('确定要删除手机用户「' + phone + '」吗？\n删除后该号码将无法登录，此操作不可恢复。')) return;
+  const regs = getPhoneRegs();
+  delete regs[phone];
+  savePhoneRegs(regs);
+  renderPhoneUserList();
+  showToast('「' + phone + '」已被删除', 'ok');
 }
 
 async function sbPushPhoneRegs(regs) {
@@ -1122,7 +1009,6 @@ async function phoneRegister() {
   const phoneEl = document.getElementById('phoneInput');
   const btnEl = document.getElementById('phoneRegisterBtn');
   const errEl = document.getElementById('loginError');
-  const statusEl = document.getElementById('phoneTrialStatus');
   const phone = phoneEl.value.trim().replace(/\D/g, '');
 
   // 验证手机号格式
@@ -1131,10 +1017,15 @@ async function phoneRegister() {
     return;
   }
 
+  // 检查管理员是否启用了手机注册
+  if (!isPhoneRegEnabled()) {
+    errEl.textContent = '手机注册功能已关闭，请联系管理员';
+    return;
+  }
+
   btnEl.disabled = true;
   btnEl.textContent = '验证中...';
   errEl.textContent = '';
-  statusEl.style.display = 'none';
 
   // 尝试从云端拉取最新注册数据
   if (SB) {
@@ -1152,41 +1043,43 @@ async function phoneRegister() {
   const now = Date.now();
 
   if (regs[phone]) {
-    // 已注册 → 检查设备
+    // 已注册 → 检查是否被禁用
     const reg = regs[phone];
+    if (reg.disabled) {
+      errEl.textContent = '此手机号已被管理员禁用，请联系管理员';
+      btnEl.disabled = false;
+      btnEl.textContent = '注册 / 登录';
+      return;
+    }
     if (reg.boundDevice && reg.boundDevice !== deviceId) {
       errEl.textContent = '此手机号已在其他设备注册，请联系管理员';
       btnEl.disabled = false;
       btnEl.textContent = '注册 / 登录';
       return;
     }
-    // 检查试用是否过期
-    if (reg.trialExpiry && now > reg.trialExpiry) {
-      errEl.textContent = '7天试用已到期，请联系管理员开通永久会员';
-      statusEl.style.display = 'block';
-      statusEl.innerHTML = '<span class="trial-badge expired">试用已到期</span>';
+    // 更新设备标签和登录时间
+    reg.boundLabel = deviceLabel;
+    reg.lastLogin = now;
+    // 检查试用期是否过期
+    if (reg.trialExpiry && new Date(reg.trialExpiry).getTime() < Date.now()) {
+      errEl.textContent = '试用期已于 ' + new Date(reg.trialExpiry).toLocaleDateString('zh-CN') + ' 到期，请联系管理员续期';
       btnEl.disabled = false;
       btnEl.textContent = '注册 / 登录';
       return;
     }
-    // 更新设备标签
-    reg.boundLabel = deviceLabel;
-    reg.lastLogin = now;
     regs[phone] = reg;
     savePhoneRegs(regs);
     if (SB) sbPushSettings().catch(() => {});
-    // 登录
     doPhoneLoginSuccess(phone, reg);
   } else {
-    // 新注册 → 7天试用
+    // 新注册 → 默认3天试用期
     const reg = {
       phone: phone,
       boundDevice: deviceId,
       boundLabel: deviceLabel,
       registeredAt: now,
-      trialExpiry: now + TRIAL_DAYS * 24 * 60 * 60 * 1000,
       lastLogin: now,
-      type: 'trial'
+      trialExpiry: calcExpiry(3).toISOString()
     };
     regs[phone] = reg;
     savePhoneRegs(regs);
@@ -1199,25 +1092,21 @@ async function phoneRegister() {
 }
 
 function doPhoneLoginSuccess(phone, reg) {
-  const daysLeft = reg.trialExpiry ? Math.ceil((reg.trialExpiry - Date.now()) / (24 * 60 * 60 * 1000)) : 0;
-  const trialDay = Math.ceil((Date.now() - reg.registeredAt) / (24 * 60 * 60 * 1000));
   sessionStorage.setItem(AUTH_KEY, '1');
   sessionStorage.setItem(AUTH_KEY + '_phone', phone);
   sessionStorage.setItem(AUTH_KEY + '_admin', '0');
-  sessionStorage.setItem(AUTH_KEY + '_trial_day', trialDay.toString());
-  sessionStorage.setItem(AUTH_KEY + '_trial_left', daysLeft.toString());
-  
+  sessionStorage.removeItem(AUTH_KEY + '_subpwd');
+  // 存储试用期信息供UI显示
+  if (reg.trialExpiry) {
+    sessionStorage.setItem(AUTH_KEY + '_trial_expiry', reg.trialExpiry);
+    const daysLeft = Math.floor((new Date(reg.trialExpiry).getTime() - Date.now()) / (24*60*60*1000));
+    sessionStorage.setItem(AUTH_KEY + '_trial_left', String(daysLeft > 0 ? daysLeft : 0));
+  }
+
   document.getElementById('loginOverlay').classList.add('hidden');
   document.getElementById('mainContent').classList.remove('blurred');
   document.getElementById('adminToggle').style.display = 'none';
-  updateTrialStatusDisplay();
-  
-  // 试用期提示
-  if (daysLeft > 0 && daysLeft <= TRIAL_DAYS) {
-    setTimeout(() => {
-      showToast(`📱 试用第 ${trialDay} 天，剩余 ${daysLeft} 天`, 4000);
-    }, 500);
-  }
+  document.getElementById('userMenuBtn').style.display = '';
 }
 
 function getCurrentPhoneUser() {
@@ -1225,35 +1114,6 @@ function getCurrentPhoneUser() {
   if (!phone) return null;
   const regs = getPhoneRegs();
   return regs[phone] || null;
-}
-
-function checkPhoneTrialStatus() {
-  const user = getCurrentPhoneUser();
-  if (!user || !user.trialExpiry) return true; // 不是手机号登录，放行
-  return Date.now() <= user.trialExpiry;
-}
-
-function updateTrialStatusDisplay() {
-  const trialEl = document.getElementById('trialStatus');
-  const dayEl = document.getElementById('trialDayCount');
-  if (!trialEl || !dayEl) return;
-  const phone = sessionStorage.getItem(AUTH_KEY + '_phone');
-  const user = getCurrentPhoneUser();
-  if (!phone || !user || !user.trialExpiry) {
-    trialEl.style.display = 'none';
-    return;
-  }
-  const daysLeft = Math.ceil((user.trialExpiry - Date.now()) / (24 * 60 * 60 * 1000));
-  const trialDay = Math.ceil((Date.now() - user.registeredAt) / (24 * 60 * 60 * 1000));
-  if (daysLeft <= 0) {
-    trialEl.style.display = 'flex';
-    trialEl.style.background = 'rgba(220,38,38,0.35)';
-    dayEl.textContent = '已到期';
-  } else {
-    trialEl.style.display = 'flex';
-    trialEl.style.background = 'rgba(255,255,255,0.2)';
-    dayEl.textContent = `第${trialDay}/${TRIAL_DAYS}天`;
-  }
 }
 
 function formatPhoneTime(ts) {
@@ -1268,8 +1128,12 @@ function isValidPassword(input) {
   // 兜底：默认主密码永不过期（防止本地被破坏后完全无法登录）
   if (input === DEFAULT_PASSWORD) return { valid: true, isMaster: true };
   const entry = (settings.extra_entries || []).find(e => e.password === input);
-  if (entry) return { valid: true, isMaster: false, entry: entry };
-  return { valid: false };
+  if (!entry) return { valid: false };
+  // 检查子密码是否过期
+  if (entry.expiry && new Date(entry.expiry).getTime() < Date.now()) {
+    return { valid: false, expired: true, expiredAt: entry.expiry };
+  }
+  return { valid: true, isMaster: false, entry: entry };
 }
 
 // 忘记密码 → 重置为默认密码
@@ -1330,7 +1194,9 @@ async function doLogin() {
   }
 
   if (!result.valid) {
-    if (!SB) {
+    if (result.expired) {
+      errEl.textContent = '⚠️ 该子密码已于 ' + new Date(result.expiredAt).toLocaleDateString('zh-CN') + ' 过期，请联系管理员续期';
+    } else if (!SB) {
       errEl.textContent = '⚠️ 网络同步组件未加载，子密码无法验证。请检查网络后刷新页面';
     } else {
       errEl.textContent = '密码错误，请重试';
@@ -1345,6 +1211,7 @@ async function doLogin() {
     document.getElementById('loginOverlay').classList.add('hidden');
     document.getElementById('mainContent').classList.remove('blurred');
     document.getElementById('adminToggle').style.display = '';
+    document.getElementById('userMenuBtn').style.display = '';
     errEl.textContent = '';
     // 记住密码
     if (document.getElementById('rememberPwd').checked) {
@@ -1355,9 +1222,25 @@ async function doLogin() {
   }
 
   // 子密码：设备绑定逻辑
-  const entry = result.entry;
+  let entry = result.entry;
   const deviceId = getDeviceId();
   const deviceLabel = getDeviceLabel();
+
+  // 绑定前先同步云端最新子密码状态，避免覆盖其他设备已绑定的记录
+  if (SB) {
+    try {
+      await Promise.race([
+        sbPullFromCloud(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('sync timeout')), 5000))
+      ]);
+    } catch(e) {
+      console.warn('Pre-bind sync failed:', e);
+    }
+    // 使用云端最新数据重新定位该子密码
+    const freshSettings = getAdminSettings();
+    const freshEntry = (freshSettings.extra_entries || []).find(e => e.password === input);
+    if (freshEntry) entry = freshEntry;
+  }
 
   if (!entry.boundDevice) {
     // 首次使用 → 绑定到当前设备
@@ -1376,9 +1259,19 @@ async function doLogin() {
 
   sessionStorage.setItem(AUTH_KEY, '1');
   sessionStorage.removeItem(AUTH_KEY + '_admin');
+  sessionStorage.setItem(AUTH_KEY + '_subpwd', input);
+  sessionStorage.removeItem(AUTH_KEY + '_phone');
+  // 存储子密码有效期信息
+  if (entry.expiry) {
+    sessionStorage.setItem(AUTH_KEY + '_sub_expiry', entry.expiry);
+  } else {
+    sessionStorage.removeItem(AUTH_KEY + '_sub_expiry');
+  }
+
   document.getElementById('loginOverlay').classList.add('hidden');
   document.getElementById('mainContent').classList.remove('blurred');
   document.getElementById('adminToggle').style.display = 'none';
+  document.getElementById('userMenuBtn').style.display = '';
   errEl.textContent = '';
   // 记住密码
   if (document.getElementById('rememberPwd').checked) {
@@ -1392,20 +1285,9 @@ function checkAuth() {
   if (isLoggedIn()) {
     document.getElementById('loginOverlay').classList.add('hidden');
     document.getElementById('mainContent').classList.remove('blurred');
-    // 主账号显示齿轮+用户菜单，用户版显示VIP入口+用户菜单
+    // 主账号显示齿轮+用户菜单，子密码/手机用户显示用户菜单
     document.getElementById('adminToggle').style.display = isAdmin ? '' : 'none';
-    document.getElementById('userMenuBtn').style.display = ''; // 主账号和用户版都显示
-    // 用户版显示VIP入口（除非已买断）
-    if (!isAdmin) {
-      const vipBtn = document.getElementById('vipBtn');
-      vipBtn.style.display = '';
-      if (memberData.active && memberData.type === 'lifetime') vipBtn.classList.add('lifetime');
-      else vipBtn.classList.remove('lifetime');
-    } else {
-      document.getElementById('vipBtn').style.display = 'none';
-    }
-    // 更新试用状态
-    updateTrialStatusDisplay();
+    document.getElementById('userMenuBtn').style.display = '';
     // 从云端拉取最新数据
     setTimeout(() => sbPullFromCloud(), 500);
   } else {
@@ -1413,7 +1295,6 @@ function checkAuth() {
     document.getElementById('mainContent').classList.add('blurred');
     document.getElementById('adminToggle').style.display = 'none';
     document.getElementById('userMenuBtn').style.display = 'none';
-    document.getElementById('vipBtn').style.display = 'none';
   }
 }
 
@@ -1472,6 +1353,7 @@ function renderSubPasswordList(filter) {
   }
 
   const filterLower = (filter || '').toLowerCase().trim();
+  const now = Date.now();
   let visibleCount = 0;
   const boundCount = entries.filter(e => e.boundDevice).length;
 
@@ -1483,8 +1365,28 @@ function renderSubPasswordList(filter) {
     const match = !filterLower || pwLower.includes(filterLower) || laLower.includes(filterLower);
     if (match) visibleCount++;
 
-    return '<div class="sub-pwd-item"' + (match ? '' : ' style="display:none"') + '>' +
+    // 计算有效期显示
+    let expiryHTML = '';
+    let rowClass = '';
+    if (entry.expiry) {
+      const expiryTime = new Date(entry.expiry).getTime();
+      const daysLeft = Math.floor((expiryTime - now) / (24 * 60 * 60 * 1000));
+      const expiryDate = new Date(entry.expiry).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+      if (expiryTime < now) {
+        expiryHTML = '<span class="sub-pwd-expiry expired" title="' + new Date(entry.expiry).toLocaleDateString('zh-CN') + ' 到期" onclick="modifySubPwdExpiry(' + idx + ')">已过期</span>';
+        rowClass = ' expired-row';
+      } else if (daysLeft <= 7) {
+        expiryHTML = '<span class="sub-pwd-expiry expiring" title="' + new Date(entry.expiry).toLocaleDateString('zh-CN') + ' 到期，点击修改" onclick="modifySubPwdExpiry(' + idx + ')">剩 ' + daysLeft + '天</span>';
+      } else {
+        expiryHTML = '<span class="sub-pwd-expiry active" title="' + new Date(entry.expiry).toLocaleDateString('zh-CN') + ' 到期，点击修改" onclick="modifySubPwdExpiry(' + idx + ')">' + expiryDate + ' 到期</span>';
+      }
+    } else {
+      expiryHTML = '<span class="sub-pwd-expiry permanent" onclick="modifySubPwdExpiry(' + idx + ')">永久</span>';
+    }
+
+    return '<div class="sub-pwd-item' + rowClass + '"' + (match ? '' : ' style="display:none"') + '>' +
       '<span class="pwd-text" title="' + entry.password + '">' + (match && filterLower ? highlightMatch(entry.password, filterLower) : entry.password) + '</span>' +
+      expiryHTML +
       '<span class="pwd-status ' + (isBound ? 'bound' : 'unbound') + '">' +
         (isBound ? '📱 ' + label : '⏳未绑定') +
       '</span>' +
@@ -1528,6 +1430,35 @@ function clearPwdSearch() {
   input.focus();
 }
 
+// 选择有效期按钮
+function selectExpiryBtn(el) {
+  const container = document.getElementById('subPwdExpiryBtns');
+  if (container) {
+    container.querySelectorAll('.sub-pwd-expiry-btn').forEach(b => b.classList.remove('active'));
+  }
+  el.classList.add('active');
+}
+
+// 获取当前选中的有效期天数
+function getSelectedExpiryDays() {
+  const active = document.querySelector('#subPwdExpiryBtns .sub-pwd-expiry-btn.active');
+  return active ? parseInt(active.dataset.days) : 0;
+}
+
+// 计算有效期到期时间（开始时间偏移n天/半年/1年+1天，因为到期当天应该可以使用，到期第二天才拒绝）
+function calcExpiry(days) {
+  const d = new Date();
+  d.setHours(23, 59, 59, 999); // 当天23:59:59
+  d.setDate(d.getDate() + days); // 加n天后
+  return d;
+}
+
+// 根据天数计算显示标签
+function daysToLabel(days) {
+  const map = { 3: '3天', 7: '7天', 15: '15天', 30: '1个月', 90: '3个月', 180: '6个月', 365: '1年', 0: '永久' };
+  return map[days] || (days + '天');
+}
+
 // 添加子密码
 function addSubPassword() {
   const input = document.getElementById('newSubPassword');
@@ -1536,9 +1467,18 @@ function addSubPassword() {
   const settings = getAdminSettings();
   if (settings.password === pwd) { showToast('子密码不能与主密码相同', 'warn'); return; }
   if (settings.extra_entries.some(e => e.password === pwd)) { showToast('该子密码已存在', 'warn'); return; }
-  settings.extra_entries.push({ password: pwd, boundDevice: null, boundLabel: null });
+  // 读取有效期
+  const days = getSelectedExpiryDays();
+  const entry = { password: pwd, boundDevice: null, boundLabel: null };
+  if (days > 0) {
+    entry.expiry = calcExpiry(days).toISOString();
+  }
+  settings.extra_entries.push(entry);
   saveSettingsToStorage(settings); // 内部已调用 sbPushSettings
   input.value = '';
+  // 重置为永久
+  const permBtn = document.querySelector('#subPwdExpiryBtns .sub-pwd-expiry-btn[data-days="0"]');
+  selectExpiryBtn(permBtn);
   renderSubPasswordList();
 }
 
@@ -1562,6 +1502,79 @@ function unbindDevice(idx) {
   saveSettingsToStorage(settings); // 内部已调用 sbPushSettings
   renderSubPasswordList();
   showToast('✅ 已解绑，该子密码可在新设备上登录');
+}
+
+// 修改子密码有效期（弹出选择面板）
+function modifySubPwdExpiry(idx) {
+  const settings = getAdminSettings();
+  if (idx < 0 || idx >= settings.extra_entries.length) return;
+  const entry = settings.extra_entries[idx];
+  const currentLabel = entry.expiry ? daysToLabelByExpiry(entry.expiry) : '永久';
+
+  // 移除旧弹层
+  const old = document.querySelector('.expiry-modal-overlay');
+  if (old) old.remove();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'expiry-modal-overlay';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+  const options = [
+    { label: '3天', days: 3 }, { label: '7天', days: 7 }, { label: '15天', days: 15 },
+    { label: '1个月', days: 30 }, { label: '3个月', days: 90 }, { label: '6个月', days: 180 },
+    { label: '1年', days: 365 }, { label: '永久', days: 0 }
+  ];
+  overlay.innerHTML = '<div class="expiry-modal-box" onclick="event.stopPropagation()">' +
+    '<div style="font-weight:700;margin-bottom:4px;">修改「' + entry.password + '」有效期</div>' +
+    '<div style="font-size:11px;color:#64748b;margin-bottom:8px;">当前：' + currentLabel + '</div>' +
+    '<div class="sub-pwd-expiry-mini-row">' +
+    options.map(o => '<span class="sub-pwd-expiry-btn" data-days="' + o.days + '">' + o.label + '</span>').join('') +
+    '</div>' +
+    '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:12px;">' +
+    '<button onclick="this.closest(\'.expiry-modal-overlay\').remove()" style="padding:6px 14px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;cursor:pointer;font-size:12px;">取消</button>' +
+    '<button id="expiryModalConfirm" style="padding:6px 14px;border:none;border-radius:6px;background:#3b82f6;color:#fff;cursor:pointer;font-size:12px;font-weight:600;">确认修改</button>' +
+    '</div></div>';
+  document.body.appendChild(overlay);
+
+  // 小面板按钮点击
+  overlay.querySelectorAll('.sub-pwd-expiry-btn').forEach(btn => {
+    btn.onclick = function() {
+      overlay.querySelectorAll('.sub-pwd-expiry-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    };
+  });
+
+  // 确认按钮
+  overlay.querySelector('#expiryModalConfirm').onclick = function() {
+    const active = overlay.querySelector('.sub-pwd-expiry-btn.active');
+    if (!active) { showToast('请选择一个有效期', 'warn'); return; }
+    const days = parseInt(active.dataset.days);
+    if (days === 0) {
+      delete entry.expiry;
+      showToast('「' + entry.password + '」已设为永久有效');
+    } else {
+      entry.expiry = calcExpiry(days).toISOString();
+      showToast('「' + entry.password + '」有效期已更新为 ' + daysToLabel(days));
+    }
+    saveSettingsToStorage(settings);
+    renderSubPasswordList(document.getElementById('subPwdSearch').value || '');
+    overlay.remove();
+  };
+}
+
+// 根据expiry计算标签
+function daysToLabelByExpiry(expiryStr) {
+  const expiryDate = new Date(expiryStr);
+  const now = new Date();
+  const diffMs = expiryDate.getTime() - now.getTime();
+  const diffDays = Math.round(diffMs / (24 * 60 * 60 * 1000));
+  if (diffDays <= 3) return '3天';
+  if (diffDays <= 7) return '7天';
+  if (diffDays <= 15) return '15天';
+  if (diffDays <= 30) return '1个月';
+  if (diffDays <= 90) return '3个月';
+  if (diffDays <= 180) return '6个月';
+  if (diffDays <= 365) return '1年';
+  return '有效期';
 }
 
 function saveAdminSettings() {
@@ -1641,6 +1654,11 @@ function downloadUpdate() {
 // 绑定登录事件
 document.addEventListener('DOMContentLoaded', () => {
   sbInit(); // 初始化 Supabase
+  // 手机注册开关：启动时同步UI
+  const phoneGrp = document.getElementById('loginPhoneGroup');
+  if (!isPhoneRegEnabled() && phoneGrp) phoneGrp.style.display = 'none';
+  const chk = document.getElementById('phoneRegEnabledChk');
+  if (chk) chk.checked = isPhoneRegEnabled();
   checkAuth();
   loadRememberedPwd();
   // 如果记住了密码且未登录，自动尝试登录
@@ -2870,7 +2888,7 @@ function renderResults(groups, parsed) {
 
   // 自动滚动到最优组合方案
   setTimeout(() => {
-    document.getElementById('resultCard')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('quickStats')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, 100);
 }
 
@@ -3213,73 +3231,47 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!wasShowing) chip.classList.add('show-del');
   });
 
-  // 会员数据加载
-  loadMemberData();
 });
-
-// ========== 会员系统 ==========
-const MEMBER_KEY = 'handrail_member_data';
-const MEMBER_CODES_KEY = 'handrail_member_codes';
-const MEMBER_QR_KEY = 'handrail_member_qr';
-
-let memberData = { type: 'free', expiry: null, active: false };
-let memberCodes = [];
-let payQRUrl = '';
-let selectedPlan = null;
-
-function loadMemberData() {
-  try {
-    const saved = localStorage.getItem(MEMBER_KEY);
-    if (saved) memberData = JSON.parse(saved);
-  } catch(e) {}
-  // 检查是否过期
-  if (memberData.active && memberData.expiry && new Date(memberData.expiry) < new Date()) {
-    memberData.active = false;
-    memberData.type = 'expired';
-    saveMemberData();
-  }
-  try {
-    const codes = localStorage.getItem(MEMBER_CODES_KEY);
-    if (codes) memberCodes = JSON.parse(codes);
-  } catch(e) { memberCodes = []; }
-  try {
-    payQRUrl = localStorage.getItem(MEMBER_QR_KEY) || window.DEFAULT_PAY_QR || '';
-  } catch(e) { payQRUrl = window.DEFAULT_PAY_QR || ''; }
-  updateMemberBadge();
-}
-
-function saveMemberData() {
-  localStorage.setItem(MEMBER_KEY, JSON.stringify(memberData));
-  sbPushMemberData(); // 同步会员状态到云端
-}
-
-function updateMemberBadge() {
-  let badge = document.getElementById('memberBadge');
-  if (memberData.active) {
-    if (!badge) {
-      badge = document.createElement('div');
-      badge.className = 'member-badge';
-      badge.id = 'memberBadge';
-      document.body.appendChild(badge);
-    }
-    badge.textContent = memberData.type === 'lifetime' ? '👑 永久会员' : '✅ 会员';
-    // 买断后隐藏VIP入口
-    if (memberData.type === 'lifetime') {
-      const vipBtn = document.getElementById('vipBtn');
-      if (vipBtn) vipBtn.classList.add('lifetime');
-    }
-  } else {
-    if (badge) badge.remove();
-    // 未激活显示VIP入口
-    const vipBtn = document.getElementById('vipBtn');
-    if (vipBtn) vipBtn.classList.remove('lifetime');
-  }
-}
 
 // 用户菜单下拉
 function toggleUserMenu() {
   const dd = document.getElementById('userDropdown');
   const isAdmin = sessionStorage.getItem(AUTH_KEY + '_admin') === '1';
+  // 显示账号信息
+  const infoEl = document.getElementById('ddAccountInfo');
+  const phone = sessionStorage.getItem(AUTH_KEY + '_phone') || '';
+  const subPwd = sessionStorage.getItem(AUTH_KEY + '_subpwd') || '';
+  if (isAdmin) {
+    infoEl.innerHTML = '🔐 <span class="uda-type">管理员账号</span>';
+  } else if (phone) {
+    const trialExpiry = sessionStorage.getItem(AUTH_KEY + '_trial_expiry');
+    const daysLeft = parseInt(sessionStorage.getItem(AUTH_KEY + '_trial_left')) || 0;
+    let expiryHtml = '';
+    if (!trialExpiry) {
+      expiryHtml = '<span style="color:#22c55e;">永久有效</span>';
+    } else if (daysLeft <= 0) {
+      expiryHtml = '<span style="color:#dc2626;">已过期</span>';
+    } else if (daysLeft <= 3) {
+      expiryHtml = '<span style="color:#f59e0b;">剩余 ' + daysLeft + ' 天</span>';
+    } else {
+      expiryHtml = '<span style="color:#22c55e;">剩余 ' + daysLeft + ' 天</span>';
+    }
+    infoEl.innerHTML = '📱 <span class="uda-id">' + phone + '</span> <span style="font-size:10px;color:#94a3b8;">(' + expiryHtml + ')</span>';
+  } else {
+    const subExpiry = sessionStorage.getItem(AUTH_KEY + '_sub_expiry');
+    let subExpiryHtml = '';
+    if (subExpiry) {
+      const daysLeft = Math.floor((new Date(subExpiry).getTime() - Date.now()) / (24*60*60*1000));
+      if (daysLeft <= 0) {
+        subExpiryHtml = ' <span style="color:#dc2626;font-size:10px;">(已过期)</span>';
+      } else if (daysLeft <= 3) {
+        subExpiryHtml = ' <span style="color:#f59e0b;font-size:10px;">(剩余' + daysLeft + '天)</span>';
+      } else {
+        subExpiryHtml = ' <span style="color:#22c55e;font-size:10px;">(剩余' + daysLeft + '天)</span>';
+      }
+    }
+    infoEl.innerHTML = '👤 子账号：<span class="uda-id">' + subPwd + '</span>' + subExpiryHtml;
+  }
   // 管理员隐藏"账号管理"菜单项
   document.getElementById('ddAccountManage').style.display = isAdmin ? 'none' : '';
   document.getElementById('ddDivider').style.display = isAdmin ? 'none' : '';
@@ -3295,10 +3287,23 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// 账号管理 → 打开会员中心
+// 账号管理
 function openAccountManage() {
   document.getElementById('userDropdown').classList.remove('show');
-  toggleMemberModal();
+  const phone = sessionStorage.getItem(AUTH_KEY + '_phone');
+  if (phone) {
+    const trialExpiry = sessionStorage.getItem(AUTH_KEY + '_trial_expiry');
+    const daysLeft = parseInt(sessionStorage.getItem(AUTH_KEY + '_trial_left')) || 0;
+    if (!trialExpiry) {
+      showToast('您的手机号 ' + phone + ' 为永久有效，请联系管理员获取更多功能权限');
+    } else if (daysLeft <= 0) {
+      showToast('您的试用期已过期，请联系管理员续期');
+    } else {
+      showToast('手机号 ' + phone + ' 试用剩余 ' + daysLeft + ' 天，请联系管理员延长试用期');
+    }
+  } else {
+    showToast('子密码由管理员发放，请联系管理员获取完整功能权限');
+  }
 }
 
 // 版本更新检查
@@ -3326,218 +3331,17 @@ function doLogout() {
   document.getElementById('userDropdown').classList.remove('show');
   sessionStorage.removeItem(AUTH_KEY);
   sessionStorage.removeItem(AUTH_KEY + '_admin');
+  sessionStorage.removeItem(AUTH_KEY + '_subpwd');
+  sessionStorage.removeItem(AUTH_KEY + '_phone');
+  sessionStorage.removeItem(AUTH_KEY + '_sub_expiry');
+  sessionStorage.removeItem(AUTH_KEY + '_trial_expiry');
+  sessionStorage.removeItem(AUTH_KEY + '_trial_left');
   document.getElementById('loginOverlay').classList.remove('hidden');
   document.getElementById('mainContent').classList.add('blurred');
   document.getElementById('loginPassword').value = '';
   document.getElementById('loginError').textContent = '';
   const panel = document.getElementById('adminPanel');
   if (panel) panel.classList.remove('show');
-}
-
-function toggleMemberModal() {
-  const overlay = document.getElementById('memberOverlay');
-  if (overlay.classList.contains('show')) {
-    closeMemberModal();
-    return;
-  }
-  selectedPlan = null;
-  updateMemberModalStatus();
-  document.getElementById('planYearly').classList.remove('selected');
-  document.getElementById('planLifetime').classList.remove('selected');
-  document.getElementById('memberPayStep').style.display = 'none';
-  overlay.classList.add('show');
-}
-
-function closeMemberModal() {
-  document.getElementById('memberOverlay').classList.remove('show');
-  document.getElementById('memberPayStep').style.display = 'none';
-  _autoCode = null;
-}
-
-function updateMemberModalStatus() {
-  const bar = document.getElementById('memberStatusBar');
-  const icon = document.getElementById('memberStatusIcon');
-  const label = document.getElementById('memberStatusLabel');
-  const value = document.getElementById('memberStatusValue');
-  const expiry = document.getElementById('memberStatusExpiry');
-  bar.className = 'member-status-bar';
-  if (memberData.active) {
-    bar.classList.add('active');
-    icon.textContent = memberData.type === 'lifetime' ? '👑' : '✅';
-    value.textContent = memberData.type === 'lifetime' ? '永久会员' : '包年会员';
-    expiry.textContent = memberData.type === 'yearly' ? '有效期至：' + formatDate(memberData.expiry) : '永久有效';
-    label.textContent = '当前状态';
-  } else if (memberData.type === 'expired') {
-    bar.classList.add('expired');
-    icon.textContent = '⏰';
-    label.textContent = '已过期';
-    value.textContent = '会员已到期';
-    expiry.textContent = '';
-  } else {
-    bar.classList.add('free');
-    icon.textContent = '🆓';
-    label.textContent = '当前状态';
-    value.textContent = '免费用户';
-    expiry.textContent = '购买会员解锁全部功能';
-  }
-}
-
-function formatDate(d) {
-  if (!d) return '';
-  const date = new Date(d);
-  return date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0');
-}
-
-function selectMemberPlan(type) {
-  selectedPlan = type;
-  document.getElementById('planYearly').classList.toggle('selected', type === 'yearly');
-  document.getElementById('planLifetime').classList.toggle('selected', type === 'lifetime');
-  // 点击卡片直接显示二维码
-  startMemberPayment();
-}
-
-let _autoCode = null; // 当前自动分配的激活码
-
-function startMemberPayment() {
-  if (!selectedPlan) return;
-  const amount = selectedPlan === 'yearly' ? 5 : 30;
-  document.getElementById('memberPayAmount').textContent = amount.toFixed(2);
-  
-  // 加载收款二维码
-  const img = document.getElementById('memberPayQRImg');
-  const placeholder = document.getElementById('memberPayPlaceholder');
-  if (payQRUrl) {
-    img.src = payQRUrl;
-    img.style.display = 'block';
-    placeholder.style.display = 'none';
-  } else {
-    img.style.display = 'none';
-    placeholder.style.display = 'flex';
-  }
-
-  // 自动分配一个未使用的激活码给用户
-  _autoCode = null;
-  const unused = memberCodes.find(c => !c.used && c.plan === selectedPlan);
-  const autoCodeEl = document.getElementById('memberAutoCode');
-  const autoCodeText = document.getElementById('memberAutoCodeText');
-  const manualTip = document.getElementById('memberManualTip');
-  const manualInput = document.getElementById('memberManualInput');
-  
-  if (unused) {
-    _autoCode = unused;
-    autoCodeText.textContent = unused.code;
-    autoCodeEl.style.display = 'block';
-    manualTip.style.display = 'block';
-    manualInput.style.display = 'block';
-  } else {
-    autoCodeEl.style.display = 'none';
-    manualTip.style.display = 'none';
-    manualInput.style.display = 'block';
-  }
-
-  document.getElementById('memberPayStep').style.display = 'block';
-  document.getElementById('memberActivateCode').value = '';
-  document.getElementById('memberActivateMsg').textContent = '';
-}
-
-// 一键激活自动分配的激活码
-function activateAutoCode() {
-  if (!_autoCode) return;
-  document.getElementById('memberActivateCode').value = _autoCode.code;
-  activateMember();
-}
-
-function closeMemberPayment() {
-  document.getElementById('memberPayStep').style.display = 'none';
-  _autoCode = null;
-}
-
-function activateMember() {
-  const code = document.getElementById('memberActivateCode').value.trim();
-  const msg = document.getElementById('memberActivateMsg');
-  if (!code) { msg.textContent = '请输入激活码'; msg.style.color = '#dc2626'; return; }
-
-  // 查找激活码
-  const found = memberCodes.find(c => c.code === code && !c.used);
-  if (!found) {
-    msg.textContent = '❌ 激活码无效或已被使用，请联系管理员';
-    msg.style.color = '#dc2626';
-    return;
-  }
-
-  // 标记已使用
-  found.used = true;
-  found.usedAt = new Date().toISOString();
-  localStorage.setItem(MEMBER_CODES_KEY, JSON.stringify(memberCodes));
-  sbPushCodes(); // 同步激活码到云端
-
-  // 激活会员
-  memberData.type = found.plan;
-  memberData.active = true;
-  if (found.plan === 'yearly') {
-    const expiry = new Date();
-    expiry.setFullYear(expiry.getFullYear() + 1);
-    memberData.expiry = expiry.toISOString();
-  } else {
-    memberData.expiry = null; // 永久
-  }
-  saveMemberData();
-  updateMemberBadge();
-  updateMemberModalStatus();
-
-  msg.textContent = '✅ 激活成功！' + (found.plan === 'lifetime' ? '永久会员' : '有效期至 ' + formatDate(memberData.expiry));
-  msg.style.color = '#10b981';
-
-  // 2秒后关闭
-  setTimeout(() => {
-    closeMemberModal();
-    updateMemberBadge();
-  }, 2000);
-}
-
-function generateMemberCode() {
-  const type = document.getElementById('memberCodeType').value;
-  const code = 'HM' + Math.random().toString(36).substring(2, 8).toUpperCase();
-  memberCodes.push({
-    code,
-    plan: type,
-    used: false,
-    createdAt: new Date().toISOString()
-  });
-  localStorage.setItem(MEMBER_CODES_KEY, JSON.stringify(memberCodes));
-  sbPushCodes();
-  renderMemberCodeList();
-  showToast('✅ 激活码已生成：' + code);
-}
-
-function renderMemberCodeList() {
-  const container = document.getElementById('memberCodeList');
-  if (!container) return;
-  if (memberCodes.length === 0) {
-    container.innerHTML = '<div style="font-size:10px;color:#94a3b8;">暂无激活码，点击上方按钮生成</div>';
-    return;
-  }
-  container.innerHTML = memberCodes.map((c, i) => `
-    <div class="member-code-item">
-      <code>${c.code}</code>
-      <span class="member-code-status ${c.used ? 'used' : 'unused'}">${c.used ? '已用' : '未用'}</span>
-      <button class="member-code-copy" onclick="event.stopPropagation();copyCode('${c.code}')" title="复制">📋</button>
-      ${!c.used ? `<button class="member-code-del" onclick="deleteMemberCode(${i})">×</button>` : ''}
-    </div>
-  `).reverse().join('');
-}
-
-function copyCode(code) {
-  navigator.clipboard.writeText(code).then(() => {
-    showToast('📋 已复制：' + code);
-  });
-}
-
-function deleteMemberCode(index) {
-  memberCodes.splice(index, 1);
-  localStorage.setItem(MEMBER_CODES_KEY, JSON.stringify(memberCodes));
-  sbPushCodes();
-  renderMemberCodeList();
 }
 
 // 手机注册用户列表渲染
@@ -3550,96 +3354,133 @@ function renderPhoneUserList() {
     container.innerHTML = '<div style="font-size:10px;color:#94a3b8;">暂无注册用户</div>';
     return;
   }
-  const now = Date.now();
   container.innerHTML = entries.map(([phone, reg]) => {
-    const daysLeft = reg.trialExpiry ? Math.ceil((reg.trialExpiry - now) / (24 * 60 * 60 * 1000)) : 0;
-    const expired = reg.trialExpiry && now > reg.trialExpiry;
-    const badgeCls = expired ? 'expired' : (daysLeft <= 1 ? 'warning' : 'active');
-    const badgeText = expired ? '已到期' : (daysLeft > 0 ? `剩余${daysLeft}天` : '永久');
+    // 计算有效期显示
+    let expiryHTML = '';
+    let rowClass = '';
+    const now = Date.now();
+    if (reg.trialExpiry) {
+      const expiryTime = new Date(reg.trialExpiry).getTime();
+      const daysLeft = Math.floor((expiryTime - now) / (24 * 60 * 60 * 1000));
+      const expiryDate = new Date(reg.trialExpiry).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+      if (expiryTime < now) {
+        expiryHTML = '<span class="sub-pwd-expiry expired" onclick="modifyPhoneUserExpiry(\'' + phone + '\')">已过期</span>';
+        rowClass = ' expired-row';
+      } else if (daysLeft <= 3) {
+        expiryHTML = '<span class="sub-pwd-expiry expiring" onclick="modifyPhoneUserExpiry(\'' + phone + '\')">剩 ' + daysLeft + '天</span>';
+      } else {
+        expiryHTML = '<span class="sub-pwd-expiry active" onclick="modifyPhoneUserExpiry(\'' + phone + '\')">' + expiryDate + ' 到期</span>';
+      }
+    } else {
+      expiryHTML = '<span class="sub-pwd-expiry permanent" onclick="modifyPhoneUserExpiry(\'' + phone + '\')">永久</span>';
+    }
+    if (reg.disabled) rowClass += ' disabled-row';
+    const disableLabel = reg.disabled ? '启用' : '禁用';
+    const disableCls = reg.disabled ? ' enabled' : '';
     return `
-      <div class="phone-user-item">
+      <div class="phone-user-item${rowClass}">
         <div class="pu-info">
-          <span class="pu-phone">📱 ${phone}</span>
-          <span class="trial-badge ${badgeCls}">${badgeText}</span>
+          <span class="pu-phone">📱 ${phone}${reg.disabled ? ' <small style="color:#dc2626;">(已禁用)</small>' : ''}</span>
+          ${expiryHTML}
         </div>
         <div class="pu-meta">注册: ${formatPhoneTime(reg.registeredAt)} · 设备: ${reg.boundLabel || '-'}</div>
+        <div class="pu-actions">
+          <button class="pu-disable-btn${disableCls}" onclick="disablePhoneUser('${phone}')">${disableLabel}</button>
+          <button class="pu-delete-btn" onclick="deletePhoneUser('${phone}')" title="删除此用户">✕</button>
+        </div>
       </div>
     `;
   }).join('');
 }
 
-// 二维码图片上传处理
-function handleQRUpload(input) {
-  const file = input.files[0];
-  if (!file) return;
-  if (file.size > 512 * 1024) { showToast('图片不能超过512KB', 'warn'); input.value = ''; return; }
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    payQRUrl = e.target.result; // base64 data URL
-    document.getElementById('memberPayQRUrl').value = '[已上传图片]';
-    // 预览
-    const preview = document.getElementById('memberQRPreview');
-    const previewImg = document.getElementById('memberQRPreviewImg');
-    previewImg.src = payQRUrl;
-    preview.style.display = 'block';
-    // 自动保存
-    localStorage.setItem(MEMBER_QR_KEY, payQRUrl);
-    sbPushPayQR(payQRUrl); // 同步收款码到云端
-    showToast('收款二维码已上传并保存');
+// 管理员修改手机用户试用期
+function modifyPhoneUserExpiry(phone) {
+  const regs = getPhoneRegs();
+  if (!regs[phone]) return;
+  const reg = regs[phone];
+  const currentLabel = reg.trialExpiry ? daysToLabelByExpiry(reg.trialExpiry) : '永久';
+
+  // 移除旧弹层
+  const old = document.querySelector('.expiry-modal-overlay');
+  if (old) old.remove();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'expiry-modal-overlay';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+  const options = [
+    { label: '3天', days: 3 }, { label: '7天', days: 7 }, { label: '15天', days: 15 },
+    { label: '1个月', days: 30 }, { label: '3个月', days: 90 }, { label: '6个月', days: 180 },
+    { label: '1年', days: 365 }, { label: '永久', days: 0 }
+  ];
+  overlay.innerHTML = '<div class="expiry-modal-box" onclick="event.stopPropagation()">' +
+    '<div style="font-weight:700;margin-bottom:4px;">修改「' + phone + '」试用期</div>' +
+    '<div style="font-size:11px;color:#64748b;margin-bottom:8px;">当前：' + currentLabel + '</div>' +
+    '<div class="sub-pwd-expiry-mini-row">' +
+    options.map(o => '<span class="sub-pwd-expiry-btn" data-days="' + o.days + '">' + o.label + '</span>').join('') +
+    '</div>' +
+    '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:12px;">' +
+    '<button onclick="this.closest(\'.expiry-modal-overlay\').remove()" style="padding:6px 14px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;cursor:pointer;font-size:12px;">取消</button>' +
+    '<button id="expiryModalConfirm" style="padding:6px 14px;border:none;border-radius:6px;background:#3b82f6;color:#fff;cursor:pointer;font-size:12px;font-weight:600;">确认修改</button>' +
+    '</div></div>';
+  document.body.appendChild(overlay);
+
+  // 小面板按钮点击
+  overlay.querySelectorAll('.sub-pwd-expiry-btn').forEach(btn => {
+    btn.onclick = function() {
+      overlay.querySelectorAll('.sub-pwd-expiry-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    };
+  });
+
+  // 确认按钮
+  overlay.querySelector('#expiryModalConfirm').onclick = function() {
+    const active = overlay.querySelector('.sub-pwd-expiry-btn.active');
+    if (!active) { showToast('请选择一个有效期', 'warn'); return; }
+    const days = parseInt(active.dataset.days);
+    if (days === 0) {
+      delete reg.trialExpiry;
+      showToast('「' + phone + '」已设为永久有效');
+    } else {
+      reg.trialExpiry = calcExpiry(days).toISOString();
+      showToast('「' + phone + '」试用期已更新为 ' + daysToLabel(days));
+    }
+    savePhoneRegs(regs);
+    renderPhoneUserList();
+    overlay.remove();
   };
-  reader.readAsDataURL(file);
 }
 
-function saveMemberQR() {
-  const input = document.getElementById('memberPayQRUrl');
-  const url = input.value.trim();
-  // 如果已经有base64图片且没改URL，保留base64
-  if (!url || url === '[已上传图片]') {
-    if (!payQRUrl) { showToast('请先上传图片或填写URL', 'warn'); return; }
-  } else if (url.startsWith('http')) {
-    payQRUrl = url;
-    localStorage.setItem(MEMBER_QR_KEY, payQRUrl);
-    sbPushPayQR(payQRUrl);
-  } else {
-    // 用户手动删了内容，也保存base64
-    localStorage.setItem(MEMBER_QR_KEY, payQRUrl);
-    sbPushPayQR(payQRUrl);
-  }
-  showToast('收款二维码已保存');
-  // 立即更新支付页面
-  const img = document.getElementById('memberPayQRImg');
-  const placeholder = document.getElementById('memberPayPlaceholder');
-  if (payQRUrl) {
-    img.src = payQRUrl;
-    img.style.display = 'block';
-    placeholder.style.display = 'none';
-  } else {
-    img.style.display = 'none';
-    placeholder.style.display = 'flex';
-  }
-}
-
-// 点击弹窗遮罩关闭会员中心
-document.getElementById('memberOverlay').addEventListener('click', (e) => {
-  if (e.target.id === 'memberOverlay') closeMemberModal();
-});
-
-// 加载激活码列表（管理面板打开时调用）
+// 管理面板打开时刷新子密码列表 + 手机用户列表（带云端同步）
 const origToggleAdmin = window.toggleAdminPanel;
 window.toggleAdminPanel = function() {
   origToggleAdmin();
   const panel = document.getElementById('adminPanel');
   if (panel.classList.contains('show')) {
-    renderMemberCodeList();
-    renderPhoneUserList();
-    const qrInput = document.getElementById('memberPayQRUrl');
-    if (payQRUrl && payQRUrl.startsWith('data:')) {
-      qrInput.value = '[已上传图片]';
-      document.getElementById('memberQRPreviewImg').src = payQRUrl;
-      document.getElementById('memberQRPreview').style.display = 'block';
-    } else {
-      qrInput.value = payQRUrl || '';
-    }
+    // 从云端拉取最新数据，再渲染
+    (async () => {
+      try {
+        if (SB) {
+          // 1. 同步子密码数据（含设备绑定信息 boundDevice/boundLabel）
+          const { data: cloudSettings } = await SB.from('handrail_settings').select('extra_entries').eq('id', 1).maybeSingle();
+          if (cloudSettings && Array.isArray(cloudSettings.extra_entries)) {
+            const local = JSON.parse(localStorage.getItem(ADMIN_KEY) || '{}');
+            local.extra_entries = cloudSettings.extra_entries;
+            if (!local.password) local.password = DEFAULT_PASSWORD;
+            localStorage.setItem(ADMIN_KEY, JSON.stringify(local));
+          }
+          // 2. 同步手机注册数据
+          const { data: regSettings } = await SB.from('handrail_settings').select('phone_regs').eq('id', 1).maybeSingle();
+          if (regSettings && regSettings.phone_regs && typeof regSettings.phone_regs === 'object') {
+            const localRegs = getPhoneRegs();
+            const merged = { ...regSettings.phone_regs, ...localRegs };
+            savePhoneRegs(merged);
+          }
+        }
+      } catch(e) { console.warn('Admin panel sync:', e.message || e); }
+      // 重新渲染两个列表，展示最新数据
+      renderSubPasswordList();
+      renderPhoneUserList();
+    })();
   }
 };
 </script>
