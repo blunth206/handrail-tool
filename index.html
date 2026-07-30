@@ -713,28 +713,26 @@ function sbInit() {
       return true;
     }
   } catch(e) { console.warn('Supabase init failed:', e); }
-  // CDN 加载中或失败时延迟重试
-  setTimeout(() => {
-    if (SB && SB !== false) return;
+  // CDN 加载中时延迟重试（最多2次，总等待约6秒）
+  let retryCount = 0;
+  function _sbRetry() {
+    if (SB) return; // 已连接成功，停止
     try {
       if (typeof supabase !== 'undefined' && supabase.createClient) {
         SB = supabase.createClient(SB_URL, SB_KEY);
-        console.log('Supabase connected (retry 1)');
+        console.log('Supabase connected (retry ' + (retryCount + 1) + ')');
+        return;
       }
-    } catch(e2) { /* retry */ }
-  }, 2000);
-  setTimeout(() => {
-    if (SB && SB !== false) return;
-    try {
-      if (typeof supabase !== 'undefined' && supabase.createClient) {
-        SB = supabase.createClient(SB_URL, SB_KEY);
-        console.log('Supabase connected (retry 2)');
-      } else {
-        console.warn('Supabase CDN unavailable - running in offline mode');
-        SB = false;
-      }
-    } catch(e3) { SB = false; }
-  }, 6000);
+    } catch(e) { /* keep trying */ }
+    retryCount++;
+    if (retryCount < 5) {
+      setTimeout(_sbRetry, 1500 * retryCount);
+    } else {
+      console.warn('Supabase CDN unavailable - running in offline mode');
+      SB = false;
+    }
+  }
+  setTimeout(_sbRetry, 2000);
   return false;
 }
 
