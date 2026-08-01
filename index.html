@@ -1407,16 +1407,16 @@ function renderSubPasswordList(filter) {
     return '<div class="sub-pwd-item' + rowClass + '"' + (match ? '' : ' style="display:none"') + '>' +
       '<div class="pwd-row-main">' +
         '<span class="pwd-text" title="' + entry.password + '">' + (match && filterLower ? highlightMatch(entry.password, filterLower) : entry.password) + '</span>' +
+        expiryHTML +
+        '<span class="pwd-status ' + (isBound ? 'bound' : 'unbound') + '">' +
+          (isBound ? '📱 ' + label : '⏳未绑定') +
+        '</span>' +
         '<div class="pwd-actions">' +
           (isBound ? '<button class="btn-pwd-action btn-unbind" title="解绑设备" onclick="unbindDevice(' + idx + ')">🔓</button>' : '') +
           '<button class="btn-pwd-action btn-delete" title="删除子密码" onclick="removeSubPassword(' + idx + ')">✕</button>' +
         '</div>' +
       '</div>' +
       '<div class="pwd-row-meta">' +
-        expiryHTML +
-        '<span class="pwd-status ' + (isBound ? 'bound' : 'unbound') + '">' +
-          (isBound ? '📱 ' + label : '⏳未绑定') +
-        '</span>' +
         usageHTML +
       '</div>' +
     '</div>';
