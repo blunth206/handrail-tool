@@ -322,6 +322,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft Ya
 .sub-pwd-item .btn-pwd-action:hover { opacity: 1; }
 .sub-pwd-item .btn-unbind { color: #d97706; }
 .sub-pwd-item .btn-delete { color: #dc2626; }
+.sub-pwd-item .pwd-usage { width: 100%; font-size: 10px; color: #94a3b8; margin-top: 2px; flex-shrink: 0; order: 5; }
+.sub-pwd-item .pwd-usage::before { content: '📊 '; }
 .sub-pwd-add-row { display: flex; gap: 6px; }
 .sub-pwd-add-row input { flex: 1; border: 1.5px solid #e2e8f0; border-radius: 6px; padding: 6px 8px; font-size: 12px; font-family: inherit; min-width: 0; }
 .sub-pwd-add-row input:focus { outline: none; border-color: #3b82f6; }
@@ -1255,6 +1257,18 @@ async function doLogin() {
   }
   // 设备匹配 → 允许登录
 
+  // 记录子密码使用情况（最后登录时间 + 累计登录次数）
+  try {
+    const usageSettings = getAdminSettings();
+    const uIdx = usageSettings.extra_entries.findIndex(e => e.password === entry.password);
+    if (uIdx >= 0) {
+      const ue = usageSettings.extra_entries[uIdx];
+      ue.lastLogin = Date.now();
+      ue.loginCount = (ue.loginCount || 0) + 1;
+      saveSettingsToStorage(usageSettings);
+    }
+  } catch(e) { console.warn('记录子密码使用失败:', e); }
+
   sessionStorage.setItem(AUTH_KEY, '1');
   sessionStorage.removeItem(AUTH_KEY + '_admin');
   sessionStorage.setItem(AUTH_KEY + '_subpwd', input);
@@ -1382,6 +1396,11 @@ function renderSubPasswordList(filter) {
       expiryHTML = '<span class="sub-pwd-expiry permanent" onclick="modifySubPwdExpiry(' + idx + ')">永久</span>';
     }
 
+    // 使用情况统计
+    const loginCount = entry.loginCount || 0;
+    const lastLogin = entry.lastLogin ? formatPhoneTime(entry.lastLogin) : '从未登录';
+    const usageHTML = '<div class="pwd-usage">登录 ' + loginCount + ' 次 · 最近：' + lastLogin + '</div>';
+
     return '<div class="sub-pwd-item' + rowClass + '"' + (match ? '' : ' style="display:none"') + '>' +
       '<span class="pwd-text" title="' + entry.password + '">' + (match && filterLower ? highlightMatch(entry.password, filterLower) : entry.password) + '</span>' +
       expiryHTML +
@@ -1390,6 +1409,7 @@ function renderSubPasswordList(filter) {
       '</span>' +
       (isBound ? '<button class="btn-pwd-action btn-unbind" title="解绑设备" onclick="unbindDevice(' + idx + ')">🔓</button>' : '') +
       '<button class="btn-pwd-action btn-delete" title="删除子密码" onclick="removeSubPassword(' + idx + ')">✕</button>' +
+      usageHTML +
     '</div>';
   }).join('');
 
